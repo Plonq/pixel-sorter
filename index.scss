@@ -114,6 +114,11 @@ header {
 
 footer {
   background-color: var(--color-body-bg);
+  text-align: center;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--color-body-fg-quiet);
+  padding: 12px;
 }
 
 .site-description {
@@ -123,191 +128,54 @@ footer {
   margin-bottom: 16px;
 }
 
-.footer {
-  text-align: center;
-  font-size: 14px;
-  font-style: italic;
-  color: var(--color-body-fg-quiet);
-  padding: 12px;
-}
-
-.main {
-  max-width: 1100px;
+main {
+  max-width: 2000px;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 24px 24px 48px;
-
-  .row {
-    width: 100%;
-    text-align: center;
-    flex-shrink: 1;
-  }
-}
-
-.textarea {
   width: 100%;
-  max-width: 100%;
-  min-width: 100%;
-  min-height: 324px;
-  max-height: 324px;
-  border-radius: var(--border-radius);
-  padding: 6px;
-  resize: none;
-  font-family: var(--font-family-mono);
-  background-color: var(--color-textarea-bg);
-  color: var(--color-textarea-fg);
-
-  &::placeholder {
-    color: var(--color-body-fg-muted);
-    font-size: 72px;
-    text-align: center;
-    line-height: calc(100% * 4);
-    vertical-align: middle;
-  }
-
-  @media screen and (max-width: 500px) {
-    min-height: 224px;
-    max-height: 224px;
-
-    &::placeholder {
-      font-size: 52px;
-      line-height: calc(100% * 4);
-    }
-  }
-}
-
-.textarea-container {
-  position: relative;
-
-  .output-controls {
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    position: absolute;
-    top: 8px;
-    right: 8px;
-  }
-
-  &:hover {
-    .output-controls {
-      opacity: 1;
-    }
-  }
-
-  @media (hover: none) {
-    &:focus .output-controls,
-    &:focus-within .output-controls {
-      opacity: 1;
-    }
-  }
-}
-
-.text-input {
-  padding: 6px 8px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius);
-  background-color: var(--color-textarea-bg);
-  color: var(--color-textarea-fg);
-
-  &::placeholder {
-    color: var(--color-body-fg-muted);
-  }
-}
-
-.text-input, .textarea {
-  &:focus {
-    outline: 2px solid var(--color-outline);
-  }
-}
-
-.controls {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  gap: 24px;
+  padding: 24px 24px 48px;
+}
+
+.controls-container {
+  flex-basis: 40%;
+  flex-grow: 1;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 8px 0;
-
-  .left {
-    margin-right: auto;
-  }
-
-  .right {
-    margin-left: auto;
-  }
-}
-
-.form-radio-group {
-  display: inline-block;
-  border-radius: var(--border-radius);
-  padding: 3px;
-  box-shadow: var(--shadow);
-
-  .form-radio:focus-within {
-    outline: 2px solid var(--color-outline);
-  }
-
-  &, .form-radio span {
-    background-color: var(--color-primary);
-    transition: background-color 0.1s ease;
-  }
-
-  .form-radio:first-child span {
-    border-start-start-radius: var(--border-radius);
-    border-end-start-radius: var(--border-radius);
-  }
-
-  .form-radio:last-child span {
-    border-start-end-radius: var(--border-radius);
-    border-end-end-radius: var(--border-radius);
-  }
-
-  .form-radio {
-    &:active span {
-      box-shadow: inset 1px 1px 5px hsla(0, 0%, 0%, 0.3)
-    }
-
-    input[type=radio] {
-      /* Add if not using autoprefixer */
-      -webkit-appearance: none;
-      appearance: none;
-      /* For iOS < 15 to remove gradient background */
-      background-color: var(--color-body-bg);
-      /* Not removed via appearance */
-      margin: 0;
-
-      &:checked + span {
-        background-color: var(--color-primary-d);
-        box-shadow: inset 1px 1px 4px hsla(0, 0%, 0%, 0.25)
-      }
-
-      &:not(:checked) + span {
-        &:hover {
-          background-color: var(--color-primary-l);
-        }
-      }
-    }
-
-    span {
-      color: var(--color-primary-fg);
-      padding: 8px 12px;
-      display: inline-block;
-      cursor: pointer;
-      border-radius: 1px;
-      text-shadow: var(--text-shadow);
-    }
-  }
-}
-
-.action-component {
-  margin-top: 24px;
+  justify-content: center;
 
   .controls {
-    margin: 8px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+    }
   }
 }
 
+.output {
+  flex-basis: 60%;
+  flex-grow: 1;
+  border: 1px solid var(--color-border);
+  height: 1000px;
+  max-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    object-fit: scale-down;
+  }
+
+  img, .placeholder {
+    max-height: 100%;
+    max-width: 100%;
+  }
+}
 
 // Utils
 
@@ -357,71 +225,6 @@ footer {
 
   &:active {
     background-color: var(--color-primary-d);
-  }
-}
-
-.custom-radio-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  margin: 8px 0;
-}
-
-.custom-radio {
-  display: grid;
-  grid-template-columns: 1em auto;
-  gap: 0.5em;
-  cursor: pointer;
-
-  input[type=radio] {
-    /* Add if not using autoprefixer */
-    -webkit-appearance: none;
-    appearance: none;
-    /* For iOS < 15 to remove gradient background */
-    background-color: var(--color-body-bg);
-    /* Not removed via appearance */
-    margin: 0;
-    width: 18px;
-    height: 18px;
-    border: 1px solid var(--color-body-fg);
-    box-shadow: inset 0 0 0 1px var(--color-body-fg-muted);
-    border-radius: 50%;
-    display: grid;
-    place-content: center;
-    cursor: inherit;
-    outline: none;
-
-    &:focus {
-      outline: 2px solid var(--color-outline);
-    }
-
-    &:before {
-      content: "";
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      opacity: 0;
-      box-shadow: inset 10px 10px 0 1px var(--color-radio);
-    }
-
-    &:checked {
-      box-shadow: inset 0 0 0 1px var(--color-radio);
-
-      &:before {
-        opacity: 1;
-      }
-    }
-
-    &:not(:checked):active:before {
-      opacity: 0.5;
-    }
-  }
-
-  &:hover {
-    input[type=radio] {
-      border-color: var(--color-body-fg-quiet);
-    }
   }
 }
 
