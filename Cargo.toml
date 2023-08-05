@@ -13,6 +13,11 @@ yew_icons = { version = "0.7.0", features = ["FeatherCopy"] }
 serde = "1"
 # WASM
 js-sys = "0.3.46"
-web-sys = { version = "0.3", features = ["Event", "EventTarget", "InputEvent", "HtmlInputElement"] }
+web-sys = { version = "0.3", features = ["Event", "EventTarget", "InputEvent", "HtmlInputElement", "DataTransfer", "DragEvent"] }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4.31"
+# Image stuff
+image = "0.24"
+itertools = "0.11"
+base64 = "0.21"
+gloo = "0.9"

@@ -1,5 +1,9 @@
+use image::ImageFormat;
 use serde::{Deserialize, Serialize};
+use std::io::{BufWriter, Cursor, Write};
 use yew_agent::{HandlerId, Public, WorkerLink};
+
+use crate::img;
 
 pub struct Worker {
     link: WorkerLink<Self>,
@@ -52,4 +56,16 @@ impl yew_agent::Worker for Worker {
     fn name_of_resource() -> &'static str {
         "worker.js"
     }
+}
+
+fn load_and_sort_img_to_b64(data: &Vec<u8>) -> String {
+    let img = image::load_from_memory(data.as_slice()).unwrap();
+    let img = img::sort_img(img);
+    let mut buf: BufWriter<Cursor<Vec<u8>>> = BufWriter::new(Cursor::new(vec![]));
+    // This takes the longest (especially if Png)
+    img.write_to(&mut buf, ImageFormat::Jpeg).unwrap();
+    buf.flush().unwrap();
+    let img_b64 = base64::encode(buf.get_ref().get_ref());
+    let data = format!("data:image/jpeg;base64,{img_b64}");
+    data
 }
