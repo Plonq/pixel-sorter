@@ -126,17 +126,19 @@ impl Component for App {
             <>
                 <Header/>
                 <main class="main">
-                    <h1>{ "Web worker demo" }</h1>
-                    <p>{ "Submit a value to calculate, then increase the counter on the main thread!"} </p>
-                    <p>{ "Large numbers will take some time!" }</p>
-                    <h3>{ "Output: " } { &self.fibonacci_output }</h3>
-                    <br />
-                    <input ref={self.input_ref.clone()} type="number" value="44" max="50"/>
-                    <button onclick={ctx.link().callback(|_| Msg::RunWorker)}>{ "submit" }</button>
-                    <br /> <br />
-                    <h3>{ "Main thread value: " } { self.clicker_value }</h3>
-                    <button onclick={ctx.link().callback(|_| Msg::Click)}>{ "click!" }</button>
-                    <p id="title">{ "Upload Your Files To The Cloud" }</p>
+                    <div style="display: none">
+                        <h1>{ "Web worker demo" }</h1>
+                        <p>{ "Submit a value to calculate, then increase the counter on the main thread!"} </p>
+                        <p>{ "Large numbers will take some time!" }</p>
+                        <h3>{ "Output: " } { &self.fibonacci_output }</h3>
+                        <br />
+                        <input ref={self.input_ref.clone()} type="number" value="44" max="50"/>
+                        <button onclick={ctx.link().callback(|_| Msg::RunWorker)}>{ "submit" }</button>
+                        <br /> <br />
+                        <h3>{ "Main thread value: " } { self.clicker_value }</h3>
+                        <button onclick={ctx.link().callback(|_| Msg::Click)}>{ "click!" }</button>
+                        <p id="title">{ "Upload Your Files To The Cloud" }</p>
+                    </div>
                     <label for="file-upload">
                         <div
                             id="drop-container"
