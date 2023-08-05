@@ -1,0 +1,437 @@
+// Reset
+html {
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, ol, ul {
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+// End reset
+
+// Vars
+
+:root {
+  --font-family-sans: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+  --font-family-mono: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+
+  --color-primary: hsl(167, 58%, 36%);
+  --color-primary-l: hsl(167, 45%, 47%);
+  --color-primary-d: hsl(165, 73%, 25%);
+  --color-secondary: hsl(0, 85%, 64%);
+  --color-secondary-l: hsl(0, 60%, 72%);
+  --color-secondary-d: hsl(0, 75%, 57%);
+  --color-body-bg: hsl(37, 35%, 93%);
+  --color-body-fg: hsl(0, 0%, 0%);
+  --color-body-fg-quiet: hsl(0, 0%, 27%);
+  --color-body-fg-muted: hsl(0, 0%, 50%);
+  --color-primary-fg: hsl(0, 0%, 100%);
+  --color-textarea-bg: hsl(0, 0%, 100%);
+  --color-textarea-fg: hsl(0, 0%, 0%);
+  --color-links: var(--color-primary-d);
+  --color-border: hsl(0, 0%, 46%);
+  --color-outline: var(--color-secondary);
+  --color-radio: var(--color-primary);
+
+  --shadow: 0px 8px 15px rgb(0 0 0 / 10%), 0px 3px 5px rgb(0 0 0 / 15%);
+  --text-shadow: 0px 2px 3px hsla(0, 0%, 0%, 25%);
+  --text-shadow-filter: drop-shadow(0px 2px 3px hsla(0, 0%, 0%, 25%));
+  --border-radius: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary: hsl(167, 58%, 30%);
+    --color-primary-l: hsl(167, 45%, 43%);
+    --color-primary-d: hsl(165, 73%, 20%);
+    --color-secondary: hsl(8, 70%, 47%);
+    --color-secondary-l: hsl(8, 60%, 54%);
+    --color-secondary-d: hsl(8, 75%, 38%);
+    --color-body-bg: hsl(30, 3%, 15%);
+    --color-body-fg: hsl(0, 0%, 80%);
+    --color-body-fg-quiet: hsl(0, 0%, 65%);
+    --color-body-fg-muted: hsl(0, 0%, 50%);
+    --color-primary-fg: hsl(0, 0%, 100%);
+    --color-textarea-bg: hsl(30, 3%, 20%);
+    --color-textarea-fg: hsl(0, 0%, 90%);
+    --color-links: var(--color-primary-l);
+    --color-border: hsl(0, 0%, 46%);
+    --color-outline: var(--color-secondary);
+    --color-radio: var(--color-primary-l);
+  }
+}
+
+// End vars
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-family-sans);
+  background-color: var(--color-body-bg);
+  color: var(--color-body-fg);
+}
+
+a, a:visited {
+  color: var(--color-links);
+}
+
+header {
+  text-align: center;
+  background-color: var(--color-primary);
+  color: var(--color-primary-fg);
+  padding: 16px;
+  box-shadow: 0 0 8px 3px hsla(0, 0%, 0%, 0.25);
+
+  .title {
+    font-size: 48px;
+    font-weight: bold;
+    margin: 0;
+  }
+}
+
+footer {
+  background-color: var(--color-body-bg);
+}
+
+.site-description {
+  text-align: center;
+  font-size: 18px;
+  margin-top: 48px;
+  margin-bottom: 16px;
+}
+
+.footer {
+  text-align: center;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--color-body-fg-quiet);
+  padding: 12px;
+}
+
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 24px 48px;
+
+  .row {
+    width: 100%;
+    text-align: center;
+    flex-shrink: 1;
+  }
+}
+
+.textarea {
+  width: 100%;
+  max-width: 100%;
+  min-width: 100%;
+  min-height: 324px;
+  max-height: 324px;
+  border-radius: var(--border-radius);
+  padding: 6px;
+  resize: none;
+  font-family: var(--font-family-mono);
+  background-color: var(--color-textarea-bg);
+  color: var(--color-textarea-fg);
+
+  &::placeholder {
+    color: var(--color-body-fg-muted);
+    font-size: 72px;
+    text-align: center;
+    line-height: calc(100% * 4);
+    vertical-align: middle;
+  }
+
+  @media screen and (max-width: 500px) {
+    min-height: 224px;
+    max-height: 224px;
+
+    &::placeholder {
+      font-size: 52px;
+      line-height: calc(100% * 4);
+    }
+  }
+}
+
+.textarea-container {
+  position: relative;
+
+  .output-controls {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+
+  &:hover {
+    .output-controls {
+      opacity: 1;
+    }
+  }
+
+  @media (hover: none) {
+    &:focus .output-controls,
+    &:focus-within .output-controls {
+      opacity: 1;
+    }
+  }
+}
+
+.text-input {
+  padding: 6px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background-color: var(--color-textarea-bg);
+  color: var(--color-textarea-fg);
+
+  &::placeholder {
+    color: var(--color-body-fg-muted);
+  }
+}
+
+.text-input, .textarea {
+  &:focus {
+    outline: 2px solid var(--color-outline);
+  }
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+
+  .left {
+    margin-right: auto;
+  }
+
+  .right {
+    margin-left: auto;
+  }
+}
+
+.form-radio-group {
+  display: inline-block;
+  border-radius: var(--border-radius);
+  padding: 3px;
+  box-shadow: var(--shadow);
+
+  .form-radio:focus-within {
+    outline: 2px solid var(--color-outline);
+  }
+
+  &, .form-radio span {
+    background-color: var(--color-primary);
+    transition: background-color 0.1s ease;
+  }
+
+  .form-radio:first-child span {
+    border-start-start-radius: var(--border-radius);
+    border-end-start-radius: var(--border-radius);
+  }
+
+  .form-radio:last-child span {
+    border-start-end-radius: var(--border-radius);
+    border-end-end-radius: var(--border-radius);
+  }
+
+  .form-radio {
+    &:active span {
+      box-shadow: inset 1px 1px 5px hsla(0, 0%, 0%, 0.3)
+    }
+
+    input[type=radio] {
+      /* Add if not using autoprefixer */
+      -webkit-appearance: none;
+      appearance: none;
+      /* For iOS < 15 to remove gradient background */
+      background-color: var(--color-body-bg);
+      /* Not removed via appearance */
+      margin: 0;
+
+      &:checked + span {
+        background-color: var(--color-primary-d);
+        box-shadow: inset 1px 1px 4px hsla(0, 0%, 0%, 0.25)
+      }
+
+      &:not(:checked) + span {
+        &:hover {
+          background-color: var(--color-primary-l);
+        }
+      }
+    }
+
+    span {
+      color: var(--color-primary-fg);
+      padding: 8px 12px;
+      display: inline-block;
+      cursor: pointer;
+      border-radius: 1px;
+      text-shadow: var(--text-shadow);
+    }
+  }
+}
+
+.action-component {
+  margin-top: 24px;
+
+  .controls {
+    margin: 8px 0;
+  }
+}
+
+
+// Utils
+
+.overlay-container {
+  position: relative;
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-radius: var(--border-radius);
+    background: hsla(0, 0%, 0%, 0.8);
+    color: white;
+    display: grid;
+
+    > .content {
+      margin: auto;
+      line-height: 1.5em;
+    }
+  }
+
+}
+
+
+.button-icon {
+  border: 0;
+  border-radius: var(--border-radius);
+  background-color: var(--color-primary);
+  color: white;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.1s ease;
+  box-shadow: var(--shadow);
+
+  * {
+    filter: var(--text-shadow-filter);
+  }
+
+  &:hover {
+    background-color: var(--color-primary-l);
+  }
+
+  &:active {
+    background-color: var(--color-primary-d);
+  }
+}
+
+.custom-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin: 8px 0;
+}
+
+.custom-radio {
+  display: grid;
+  grid-template-columns: 1em auto;
+  gap: 0.5em;
+  cursor: pointer;
+
+  input[type=radio] {
+    /* Add if not using autoprefixer */
+    -webkit-appearance: none;
+    appearance: none;
+    /* For iOS < 15 to remove gradient background */
+    background-color: var(--color-body-bg);
+    /* Not removed via appearance */
+    margin: 0;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--color-body-fg);
+    box-shadow: inset 0 0 0 1px var(--color-body-fg-muted);
+    border-radius: 50%;
+    display: grid;
+    place-content: center;
+    cursor: inherit;
+    outline: none;
+
+    &:focus {
+      outline: 2px solid var(--color-outline);
+    }
+
+    &:before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      opacity: 0;
+      box-shadow: inset 10px 10px 0 1px var(--color-radio);
+    }
+
+    &:checked {
+      box-shadow: inset 0 0 0 1px var(--color-radio);
+
+      &:before {
+        opacity: 1;
+      }
+    }
+
+    &:not(:checked):active:before {
+      opacity: 0.5;
+    }
+  }
+
+  &:hover {
+    input[type=radio] {
+      border-color: var(--color-body-fg-quiet);
+    }
+  }
+}
+
+// Hide visually only
+.sr-only:not(:focus):not(:active) {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
