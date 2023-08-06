@@ -177,13 +177,14 @@ impl Component for App {
 
 impl App {
     fn view_img(img: &ImageDetails) -> Html {
-        let data = if let Some(sorted) = &img.sorted_data {
-            sorted
+        let (data, file_type) = if let Some(sorted) = &img.sorted_data {
+            // Sorted image is always jpeg (png encoding is really slow)
+            (sorted, "image/jpeg".to_string())
         } else {
-            &img.data
+            (&img.data, img.file_type.clone())
         };
         html! {
-            <img src={format!("data:{};base64,{}", img.file_type, b64.encode(data.as_slice()))} alt={img.name.clone()} />
+            <img src={format!("data:{};base64,{}", file_type, b64.encode(data.as_slice()))} alt={img.name.clone()} />
         }
     }
 
