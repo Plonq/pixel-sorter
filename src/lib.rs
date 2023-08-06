@@ -30,6 +30,8 @@ pub enum Msg {
     ImageLoaded(String, String, Vec<u8>),
     SetLowerThreshold(u8),
     SetUpperThreshold(u8),
+    SetDirection(img::Direction),
+    SetOrder(img::Order),
     // Worker
     RunWorker,
     WorkerMsg(WorkerOutput),
@@ -40,8 +42,7 @@ pub struct App {
     img: Option<ImageDetails>,
     img_reader: Option<FileReader>,
     loading: bool,
-    lower_threshold: u8,
-    upper_threshold: u8,
+    sort_settings: img::SortSettings,
     // Worker
     worker: Box<dyn Bridge<Worker>>,
 }
@@ -62,8 +63,12 @@ impl Component for App {
             img_reader: None,
             loading: false,
             worker,
-            lower_threshold: 50,
-            upper_threshold: 200,
+            sort_settings: img::SortSettings {
+                lower_threshold: 50,
+                upper_threshold: 150,
+                direction: img::Direction::Horizontal,
+                order: img::Order::Ascending,
+            },
         }
     }
 
@@ -104,17 +109,25 @@ impl Component for App {
                 true
             }
             Msg::SetLowerThreshold(value) => {
-                self.lower_threshold = value;
-                if self.upper_threshold <= self.lower_threshold {
-                    self.upper_threshold = self.lower_threshold;
+                self.sort_settings.lower_threshold = value;
+                if self.sort_settings.upper_threshold <= self.sort_settings.lower_threshold {
+                    self.sort_settings.upper_threshold = self.sort_settings.lower_threshold;
                 }
                 true
             }
             Msg::SetUpperThreshold(value) => {
-                self.upper_threshold = value;
-                if self.lower_threshold >= self.upper_threshold {
-                    self.lower_threshold = self.upper_threshold;
+                self.sort_settings.upper_threshold = value;
+                if self.sort_settings.lower_threshold >= self.sort_settings.upper_threshold {
+                    self.sort_settings.lower_threshold = self.sort_settings.upper_threshold;
                 }
+                true
+            }
+            Msg::SetDirection(direction) => {
+                self.sort_settings.direction = direction;
+                true
+            }
+            Msg::SetOrder(order) => {
+                self.sort_settings.order = order;
                 true
             }
             // Worker
@@ -123,8 +136,7 @@ impl Component for App {
                     self.loading = true;
                     self.worker.send(WorkerInput {
                         img_data: img_details.data.clone(),
-                        lower_threshold: self.lower_threshold,
-                        upper_threshold: self.upper_threshold,
+                        settings: self.sort_settings.clone(),
                     });
                 }
                 true
@@ -181,12 +193,12 @@ impl Component for App {
                                         type="range"
                                         min="0"
                                         max="255"
-                                        value={self.lower_threshold.to_string()}
+                                        value={self.sort_settings.lower_threshold.to_string()}
                                         oninput={ctx.link().callback(|e: InputEvent| {
                                             Msg::SetLowerThreshold(e.target_unchecked_into::<HtmlInputElement>().value().parse::<u8>().unwrap())
                                         })}
                                     />
-                                    { self.lower_threshold }
+                                    { self.sort_settings.lower_threshold }
                                 </label>
                                 <label>
                                     { "Upper threshold: "}
@@ -195,12 +207,48 @@ impl Component for App {
                                         type="range"
                                         min="0"
                                         max="255"
-                                        value={self.upper_threshold.to_string()}
+                                        value={self.sort_settings.upper_threshold.to_string()}
                                         oninput={ctx.link().callback(|e: InputEvent| {
                                             Msg::SetUpperThreshold(e.target_unchecked_into::<HtmlInputElement>().value().parse::<u8>().unwrap())
                                         })}
                                     />
-                                    { self.upper_threshold }
+                                    { self.sort_settings.upper_threshold }
+                                </label>
+                            </div>
+                            <div class={classes!("direction")}>
+                                <label>
+                                    <input
+                                        type="radio"
+                                        checked={self.sort_settings.direction == img::Direction::Horizontal}
+                                        onchange={ctx.link().callback(|_: Event| Msg::SetDirection(img::Direction::Horizontal))}
+                                    />
+                                    {"Horizontal"}
+                                </label>
+                                <label>
+                                    <input
+                                        type="radio"
+                                        checked={self.sort_settings.direction == img::Direction::Vertical}
+                                        onchange={ctx.link().callback(|_: Event| Msg::SetDirection(img::Direction::Vertical))}
+                                    />
+                                    {"Vertical"}
+                                </label>
+                            </div>
+                            <div class={classes!("order")}>
+                                <label>
+                                    <input
+                                        type="radio"
+                                        checked={self.sort_settings.order == img::Order::Ascending}
+                                        onchange={ctx.link().callback(|_: Event| Msg::SetOrder(img::Order::Ascending))}
+                                    />
+                                    {"Ascending"}
+                                </label>
+                                <label>
+                                    <input
+                                        type="radio"
+                                        checked={self.sort_settings.order == img::Order::Descending}
+                                        onchange={ctx.link().callback(|_: Event| Msg::SetOrder(img::Order::Descending))}
+                                    />
+                                    {"Descending"}
                                 </label>
                             </div>
                             <div class={classes!("button-row")}>

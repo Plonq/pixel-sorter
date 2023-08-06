@@ -13,8 +13,7 @@ pub struct Worker {
 #[derive(Serialize, Deserialize)]
 pub struct WorkerInput {
     pub img_data: Vec<u8>,
-    pub lower_threshold: u8,
-    pub upper_threshold: u8,
+    pub settings: img::SortSettings,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -52,7 +51,7 @@ fn load_and_sort_img_to_b64(input: &WorkerInput) -> Vec<u8> {
     info!("Decoding image");
     let img = image::load_from_memory(input.img_data.as_slice()).unwrap();
     info!("Sorting pixels");
-    let img = img::sort_img(img, input.lower_threshold, input.upper_threshold);
+    let img = img::sort_img(img, input.settings.clone());
     let mut buf: BufWriter<Cursor<Vec<u8>>> = BufWriter::new(Cursor::new(vec![]));
     // This takes the longest (especially if Png)
     info!("Encoding image");
