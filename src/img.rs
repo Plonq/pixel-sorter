@@ -1,6 +1,4 @@
 use image::{DynamicImage, GenericImage, GenericImageView, ImageBuffer, Pixel, Rgba};
-use itertools::Itertools;
-use log::info;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, PartialEq, Clone)]
