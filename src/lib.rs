@@ -1,11 +1,7 @@
-#![recursion_limit = "1024"]
-#![allow(clippy::large_enum_variant)]
-
 use std::rc::Rc;
 
 use gloo::file::callbacks::FileReader;
 use gloo::file::File;
-use log::info;
 use web_sys::{DragEvent, Event, FileList, HtmlInputElement};
 use yew::html::TargetCast;
 use yew::prelude::*;
@@ -28,14 +24,10 @@ struct ImageDetails {
 }
 
 pub enum Msg {
-    SetImage(Option<File>),
-    SetLoading(bool),
+    LoadImage(Option<File>),
     ImageLoaded(String, String, Vec<u8>),
-    // temp
-    Click,
     RunWorker,
     WorkerMsg(WorkerOutput),
-    // img
 }
 
 pub struct App {
@@ -43,10 +35,6 @@ pub struct App {
     img_reader: Option<FileReader>,
     loading: bool,
     worker: Box<dyn Bridge<Worker>>,
-    // temp
-    clicker_value: u32,
-    input_ref: NodeRef,
-    fibonacci_output: String,
 }
 
 impl Component for App {
@@ -64,23 +52,20 @@ impl Component for App {
             img: None,
             img_reader: None,
             loading: false,
-            // demo
-            clicker_value: 0,
-            input_ref: NodeRef::default(),
             worker,
-            fibonacci_output: String::from("Try out some fibonacci calculations!"),
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::SetImage(file) => {
+            Msg::LoadImage(file) => {
                 if let Some(file) = file {
+                    self.loading = true;
                     let file_name = file.name();
                     let file_type = file.raw_mime_type();
 
                     let link = ctx.link().clone();
-                    let file_name = file_name.clone();
+                    let file_name = file_name;
 
                     self.img_reader =
                         Some(gloo::file::callbacks::read_as_bytes(&file, move |res| {
@@ -94,12 +79,9 @@ impl Component for App {
                     self.img = None;
                     self.img_reader = None;
                 }
-            }
-            Msg::SetLoading(loading) => {
-                self.loading = loading;
+                true
             }
             Msg::ImageLoaded(file_name, file_type, data) => {
-                info!("Image loaded!");
                 self.img = Some(ImageDetails {
                     data,
                     file_type,
@@ -107,26 +89,27 @@ impl Component for App {
                     sorted_data: None,
                 });
                 self.img_reader = None;
-            }
-            Msg::Click => {
-                self.clicker_value += 1;
+                self.loading = false;
+                true
             }
             Msg::RunWorker => {
                 if let Some(img_details) = &self.img {
+                    self.loading = true;
                     self.worker.send(WorkerInput {
                         img_data: img_details.data.clone(),
                     });
                 }
+                true
             }
             Msg::WorkerMsg(output) => {
                 // the worker is done!
                 if let Some(img) = &mut self.img {
                     img.sorted_data = Some(output.img_data);
+                    self.loading = false;
                 }
+                true
             }
         }
-
-        true
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
@@ -164,7 +147,7 @@ impl Component for App {
                                 })}
                             />
                             <div class={classes!("button-row")}>
-                                <button type="button" onclick={ctx.link().callback(|_| Msg::SetImage(None))}>{"Reset"}</button>
+                                <button type="button" onclick={ctx.link().callback(|_| Msg::LoadImage(None))}>{"Reset"}</button>
                                 <button type="button" onclick={ctx.link().callback(|_| Msg::RunWorker)}>{"Sort!"}</button>
                             </div>
                         </div>
@@ -211,9 +194,9 @@ impl App {
                 .map(|v| web_sys::File::from(v.unwrap()))
                 .map(File::from)
                 .next();
-            Msg::SetImage(file)
+            Msg::LoadImage(file)
         } else {
-            Msg::SetImage(None)
+            Msg::LoadImage(None)
         }
     }
 }

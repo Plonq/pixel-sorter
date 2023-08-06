@@ -35,30 +35,11 @@ impl yew_agent::Worker for Worker {
     }
 
     fn handle_input(&mut self, msg: Self::Input, id: HandlerId) {
-        info!("Hi from worker!");
-        // this runs in a web worker
-        // and does not block the main
-        // browser thread!
-
         let img_data = msg.img_data;
         let sorted = load_and_sort_img_to_b64(&img_data);
         let output = Self::Output { img_data: sorted };
 
         self.link.respond(id, output)
-
-        // let n = msg.n;
-        //
-        // fn fib(n: u32) -> u32 {
-        //     if n <= 1 {
-        //         1
-        //     } else {
-        //         fib(n - 1) + fib(n - 2)
-        //     }
-        // }
-        //
-        // let output = Self::Output { value: fib(n) };
-        //
-        // self.link.respond(id, output);
     }
 
     fn name_of_resource() -> &'static str {
@@ -67,11 +48,15 @@ impl yew_agent::Worker for Worker {
 }
 
 fn load_and_sort_img_to_b64(data: &Vec<u8>) -> Vec<u8> {
+    info!("Decoding image");
     let img = image::load_from_memory(data.as_slice()).unwrap();
+    info!("Sorting pixels");
     let img = img::sort_img(img);
     let mut buf: BufWriter<Cursor<Vec<u8>>> = BufWriter::new(Cursor::new(vec![]));
     // This takes the longest (especially if Png)
+    info!("Encoding image");
     img.write_to(&mut buf, ImageFormat::Jpeg).unwrap();
     buf.flush().unwrap();
+    info!("Done");
     buf.get_ref().to_owned().into_inner()
 }
