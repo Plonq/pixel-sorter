@@ -1,18 +1,14 @@
-# ReCoder
+# Pixel Sorter
 
-A simple web-based tool for text encoding, decoding, and hashing. 100% client-side,
-100% Rust, 0% cruft.
+Implementation of image pixel sorting using WebAssembly in a web worker.
+
+Here's a [summary of what pixel sorting is](http://satyarth.me/articles/pixel-sorting/).
+
+![Example image with sorted pixels](assets/example.jpg)
 
 # Demo
 
-https://recoder.plonq.org
-
-## Why?
-
-Sometimes I need to encode or decode text as a one-off. There are
-many existing web tools, but most of them are cluttered,
-single-purpose, have ads, etc. Plus, I can't be sure of the privacy.
-Creating my own tool solves all these problems.
+https://pixel-sorter.plonq.org
 
 ## Tech Stack
 
