@@ -5,6 +5,7 @@ use std::rc::Rc;
 
 use gloo::file::callbacks::FileReader;
 use gloo::file::File;
+use log::info;
 use web_sys::{DragEvent, Event, FileList, HtmlInputElement};
 use yew::html::TargetCast;
 use yew::prelude::*;
@@ -23,6 +24,7 @@ struct ImageDetails {
     name: String,
     file_type: String,
     data: Vec<u8>,
+    sorted_data: Option<Vec<u8>>,
 }
 
 pub enum Msg {
@@ -40,10 +42,10 @@ pub struct App {
     img: Option<ImageDetails>,
     img_reader: Option<FileReader>,
     loading: bool,
+    worker: Box<dyn Bridge<Worker>>,
     // temp
     clicker_value: u32,
     input_ref: NodeRef,
-    worker: Box<dyn Bridge<Worker>>,
     fibonacci_output: String,
 }
 
@@ -97,27 +99,30 @@ impl Component for App {
                 self.loading = loading;
             }
             Msg::ImageLoaded(file_name, file_type, data) => {
+                info!("Image loaded!");
                 self.img = Some(ImageDetails {
                     data,
                     file_type,
                     name: file_name,
+                    sorted_data: None,
                 });
                 self.img_reader = None;
             }
-            Self::Message::Click => {
+            Msg::Click => {
                 self.clicker_value += 1;
             }
-            Self::Message::RunWorker => {
-                if let Some(input) = self.input_ref.cast::<HtmlInputElement>() {
-                    // start the worker off!
+            Msg::RunWorker => {
+                if let Some(img_details) = &self.img {
                     self.worker.send(WorkerInput {
-                        n: input.value_as_number() as u32,
+                        img_data: img_details.data.clone(),
                     });
                 }
             }
-            Self::Message::WorkerMsg(output) => {
+            Msg::WorkerMsg(output) => {
                 // the worker is done!
-                self.fibonacci_output = format!("Fibonacci value: {}", output.value);
+                if let Some(img) = &mut self.img {
+                    img.sorted_data = Some(output.img_data);
+                }
             }
         }
 
@@ -159,8 +164,8 @@ impl Component for App {
                                 })}
                             />
                             <div class={classes!("button-row")}>
-                                <button type="button">{"Reset"}</button>
-                                <button type="button">{"Sort!"}</button>
+                                <button type="button" onclick={ctx.link().callback(|_| Msg::SetImage(None))}>{"Reset"}</button>
+                                <button type="button" onclick={ctx.link().callback(|_| Msg::RunWorker)}>{"Sort!"}</button>
                             </div>
                         </div>
                     </div>
@@ -175,23 +180,6 @@ impl Component for App {
                             }
                         }
                     </div>
-
-
-
-
-                    <div style="display: none">
-                        <h1>{ "Web worker demo" }</h1>
-                        <p>{ "Submit a value to calculate, then increase the counter on the main thread!"} </p>
-                        <p>{ "Large numbers will take some time!" }</p>
-                        <h3>{ "Output: " } { &self.fibonacci_output }</h3>
-                        <br />
-                        <input ref={self.input_ref.clone()} type="number" value="44" max="50"/>
-                        <button onclick={ctx.link().callback(|_| Msg::RunWorker)}>{ "submit" }</button>
-                        <br /> <br />
-                        <h3>{ "Main thread value: " } { self.clicker_value }</h3>
-                        <button onclick={ctx.link().callback(|_| Msg::Click)}>{ "click!" }</button>
-                        <p id="title">{ "Upload Your Files To The Cloud" }</p>
-                    </div>
                 </main>
                 <footer class="footer">
                     { "Powered by Rust, WebAssembly, and the Yew framework. " }
@@ -205,8 +193,13 @@ impl Component for App {
 
 impl App {
     fn view_img(img: &ImageDetails) -> Html {
+        let data = if let Some(sorted) = &img.sorted_data {
+            sorted
+        } else {
+            &img.data
+        };
         html! {
-            <img src={format!("data:{};base64,{}", img.file_type, base64::encode(&img.data))} alt={img.name.clone()} />
+            <img src={format!("data:{};base64,{}", img.file_type, base64::encode(data))} alt={img.name.clone()} />
         }
     }
 

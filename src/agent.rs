@@ -1,4 +1,5 @@
 use image::ImageFormat;
+use log::info;
 use serde::{Deserialize, Serialize};
 use std::io::{BufWriter, Cursor, Write};
 use yew_agent::{HandlerId, Public, WorkerLink};
@@ -11,12 +12,12 @@ pub struct Worker {
 
 #[derive(Serialize, Deserialize)]
 pub struct WorkerInput {
-    pub n: u32,
+    pub img_data: Vec<u8>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct WorkerOutput {
-    pub value: u32,
+    pub img_data: Vec<u8>,
 }
 
 impl yew_agent::Worker for Worker {
@@ -34,23 +35,30 @@ impl yew_agent::Worker for Worker {
     }
 
     fn handle_input(&mut self, msg: Self::Input, id: HandlerId) {
+        info!("Hi from worker!");
         // this runs in a web worker
         // and does not block the main
         // browser thread!
 
-        let n = msg.n;
+        let img_data = msg.img_data;
+        let sorted = load_and_sort_img_to_b64(&img_data);
+        let output = Self::Output { img_data: sorted };
 
-        fn fib(n: u32) -> u32 {
-            if n <= 1 {
-                1
-            } else {
-                fib(n - 1) + fib(n - 2)
-            }
-        }
+        self.link.respond(id, output)
 
-        let output = Self::Output { value: fib(n) };
-
-        self.link.respond(id, output);
+        // let n = msg.n;
+        //
+        // fn fib(n: u32) -> u32 {
+        //     if n <= 1 {
+        //         1
+        //     } else {
+        //         fib(n - 1) + fib(n - 2)
+        //     }
+        // }
+        //
+        // let output = Self::Output { value: fib(n) };
+        //
+        // self.link.respond(id, output);
     }
 
     fn name_of_resource() -> &'static str {
@@ -58,14 +66,12 @@ impl yew_agent::Worker for Worker {
     }
 }
 
-fn load_and_sort_img_to_b64(data: &Vec<u8>) -> String {
+fn load_and_sort_img_to_b64(data: &Vec<u8>) -> Vec<u8> {
     let img = image::load_from_memory(data.as_slice()).unwrap();
     let img = img::sort_img(img);
     let mut buf: BufWriter<Cursor<Vec<u8>>> = BufWriter::new(Cursor::new(vec![]));
     // This takes the longest (especially if Png)
     img.write_to(&mut buf, ImageFormat::Jpeg).unwrap();
     buf.flush().unwrap();
-    let img_b64 = base64::encode(buf.get_ref().get_ref());
-    let data = format!("data:image/jpeg;base64,{img_b64}");
-    data
+    buf.get_ref().to_owned().into_inner()
 }
