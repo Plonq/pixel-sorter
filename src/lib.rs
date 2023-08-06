@@ -25,16 +25,24 @@ struct ImageDetails {
 }
 
 pub enum Msg {
+    // Image
     LoadImage(Option<File>),
     ImageLoaded(String, String, Vec<u8>),
+    SetLowerThreshold(u8),
+    SetUpperThreshold(u8),
+    // Worker
     RunWorker,
     WorkerMsg(WorkerOutput),
 }
 
 pub struct App {
+    // Image
     img: Option<ImageDetails>,
     img_reader: Option<FileReader>,
     loading: bool,
+    lower_threshold: u8,
+    upper_threshold: u8,
+    // Worker
     worker: Box<dyn Bridge<Worker>>,
 }
 
@@ -54,6 +62,8 @@ impl Component for App {
             img_reader: None,
             loading: false,
             worker,
+            lower_threshold: 50,
+            upper_threshold: 200,
         }
     }
 
@@ -93,11 +103,28 @@ impl Component for App {
                 self.loading = false;
                 true
             }
+            Msg::SetLowerThreshold(value) => {
+                self.lower_threshold = value;
+                if self.upper_threshold <= self.lower_threshold {
+                    self.upper_threshold = self.lower_threshold;
+                }
+                true
+            }
+            Msg::SetUpperThreshold(value) => {
+                self.upper_threshold = value;
+                if self.lower_threshold >= self.upper_threshold {
+                    self.lower_threshold = self.upper_threshold;
+                }
+                true
+            }
+            // Worker
             Msg::RunWorker => {
                 if let Some(img_details) = &self.img {
                     self.loading = true;
                     self.worker.send(WorkerInput {
                         img_data: img_details.data.clone(),
+                        lower_threshold: self.lower_threshold,
+                        upper_threshold: self.upper_threshold,
                     });
                 }
                 true
@@ -120,9 +147,8 @@ impl Component for App {
                 <main class="main">
                     <div class={classes!("controls-container")}>
                         <div class={classes!("controls")}>
-                            <p>{"Open an image to sort its pixels!"}</p>
                             <div
-                                id="drop-container"
+                                class={classes!("drop-container")}
                                 ondrop={ctx.link().callback(|event: DragEvent| {
                                     event.prevent_default();
                                     let files = event.data_transfer().unwrap().files();
@@ -136,7 +162,7 @@ impl Component for App {
                                 })}
                             >
                                 <Icon icon_id={IconId::FeatherUpload} />
-                                <p>{"Drop your images here or click to select"}</p>
+                                <p>{"Drop your image here or click to select"}</p>
                             </div>
                             <input
                                 id="file-upload"
@@ -147,6 +173,36 @@ impl Component for App {
                                     Self::load_image(input.files())
                                 })}
                             />
+                            <div class={classes!("threshold")}>
+                                <label>
+                                    { "Lower threshold: "}
+                                    <input
+                                        id="lower-threshold"
+                                        type="range"
+                                        min="0"
+                                        max="255"
+                                        value={self.lower_threshold.to_string()}
+                                        oninput={ctx.link().callback(|e: InputEvent| {
+                                            Msg::SetLowerThreshold(e.target_unchecked_into::<HtmlInputElement>().value().parse::<u8>().unwrap())
+                                        })}
+                                    />
+                                    { self.lower_threshold }
+                                </label>
+                                <label>
+                                    { "Upper threshold: "}
+                                    <input
+                                        id="upper-threshold"
+                                        type="range"
+                                        min="0"
+                                        max="255"
+                                        value={self.upper_threshold.to_string()}
+                                        oninput={ctx.link().callback(|e: InputEvent| {
+                                            Msg::SetUpperThreshold(e.target_unchecked_into::<HtmlInputElement>().value().parse::<u8>().unwrap())
+                                        })}
+                                    />
+                                    { self.upper_threshold }
+                                </label>
+                            </div>
                             <div class={classes!("button-row")}>
                                 <button type="button" onclick={ctx.link().callback(|_| Msg::LoadImage(None))}>{"Reset"}</button>
                                 <button type="button" onclick={ctx.link().callback(|_| Msg::RunWorker)}>{"Sort!"}</button>

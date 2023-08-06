@@ -1,8 +1,11 @@
 use image::{DynamicImage, GenericImageView, ImageBuffer, Pixel, Rgba};
 use itertools::Itertools;
 
-pub fn sort_img(img: DynamicImage) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
-    // let img = img.to_rgba8();
+pub fn sort_img(
+    img: DynamicImage,
+    lum_threshold_lower: u8,
+    lum_threshold_upper: u8,
+) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
     let (w, h) = img.dimensions();
     let mut output = ImageBuffer::new(w, h);
 
@@ -11,9 +14,6 @@ pub fn sort_img(img: DynamicImage) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
     for row in &img.pixels().chunks(w as usize) {
         rows.push(row.map(|(_, _, val)| val).collect())
     }
-
-    // For each row, find all spans based on luminance mask, then sort each span individually
-    let (min_lum, max_lum) = (50, 200);
 
     // let mut new_rows = vec![];
     for row in rows.iter_mut() {
@@ -27,7 +27,7 @@ pub fn sort_img(img: DynamicImage) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
             // } else {
             //     new_row.push(Rgba::from([255, 255, 255, 255]));
             // }
-            if luminance < min_lum || luminance > max_lum {
+            if luminance < lum_threshold_lower || luminance > lum_threshold_upper {
                 if (span_start as isize) < (i as isize) - 1 {
                     // Sort the span
                     let mut span = row[span_start..i].to_vec();
