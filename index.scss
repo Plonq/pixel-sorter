@@ -31,13 +31,13 @@ img {
   --font-family-sans: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
   --font-family-mono: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
 
-  --color-primary: #FF220C;
-  --color-primary-l: #FF220C;
-  --color-primary-d: #D33E43;
-  --color-secondary: #1C1F33;
-  --color-secondary-l: #666370;
-  --color-secondary-d: #1C1F33;
-  --color-body-bg: hsl(37, 35%, 93%);
+  --color-primary: hsl(5, 100%, 52%);
+  --color-primary-l: hsl(5, 70%, 72%);
+  --color-primary-d: hsl(358, 63%, 44%);
+  --color-secondary: hsl(232, 29%, 15%);
+  --color-secondary-l: hsl(254, 6%, 41%);
+  --color-secondary-d: hsl(232, 29%, 10%);
+  --color-body-bg: hsl(232, 10%, 97%);
   --color-body-fg: hsl(0, 0%, 0%);
   --color-body-fg-quiet: hsl(0, 0%, 27%);
   --color-body-fg-muted: hsl(0, 0%, 50%);
@@ -47,7 +47,6 @@ img {
   --color-links: var(--color-primary-d);
   --color-border: hsl(0, 0%, 46%);
   --color-outline: var(--color-secondary);
-  --color-radio: var(--color-primary);
 
   --shadow: 0px 8px 15px rgb(0 0 0 / 10%), 0px 3px 5px rgb(0 0 0 / 15%);
   --text-shadow: 0px 2px 3px hsla(0, 0%, 0%, 25%);
@@ -57,13 +56,13 @@ img {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-primary: #FF220C;
-    --color-primary-l: #FF220C;
-    --color-primary-d: #D33E43;
-    --color-secondary: #1C1F33;
-    --color-secondary-l: #666370;
-    --color-secondary-d: #1C1F33;
-    --color-body-bg: hsl(30, 3%, 15%);
+    --color-primary: hsl(5, 100%, 52%);
+    --color-primary-l: hsl(5, 70%, 72%);
+    --color-primary-d: hsl(358, 63%, 44%);
+    --color-secondary: hsl(232, 29%, 15%);
+    --color-secondary-l: hsl(254, 6%, 41%);
+    --color-secondary-d: hsl(232, 29%, 10%);
+    --color-body-bg: hsl(232, 10%, 10%);
     --color-body-fg: hsl(0, 0%, 80%);
     --color-body-fg-quiet: hsl(0, 0%, 65%);
     --color-body-fg-muted: hsl(0, 0%, 50%);
@@ -73,7 +72,6 @@ img {
     --color-links: var(--color-primary-l);
     --color-border: hsl(0, 0%, 46%);
     --color-outline: var(--color-secondary);
-    --color-radio: var(--color-primary-l);
   }
 }
 
