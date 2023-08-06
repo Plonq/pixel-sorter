@@ -33,10 +33,10 @@ pub fn sort_img(img: DynamicImage, settings: SortSettings) -> ImageBuffer<Rgba<u
                 let mut span_start: u32 = 0;
                 for x in 0..w {
                     let pixel = img.get_pixel(x, y);
-                    output.put_pixel(x, y, pixel); // todo: don't put pixel if we're sorting it
                     let luminance = pixel.to_luma().0[0];
                     if luminance < settings.lower_threshold || luminance > settings.upper_threshold
                     {
+                        output.put_pixel(x, y, pixel);
                         if (span_start as isize) < (x as isize) - 1 {
                             // Sort the span
                             let mut span = (span_start..x)
@@ -64,10 +64,10 @@ pub fn sort_img(img: DynamicImage, settings: SortSettings) -> ImageBuffer<Rgba<u
                 let mut span_start: u32 = 0;
                 for y in 0..h {
                     let pixel = img.get_pixel(x, y);
-                    output.put_pixel(x, y, pixel); // todo: don't put pixel if we're sorting it
                     let luminance = pixel.to_luma().0[0];
                     if luminance < settings.lower_threshold || luminance > settings.upper_threshold
                     {
+                        output.put_pixel(x, y, pixel);
                         if (span_start as isize) < (y as isize) - 1 {
                             // Sort the span
                             let mut span = (span_start..y)
