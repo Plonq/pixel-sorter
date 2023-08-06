@@ -1,5 +1,6 @@
 use std::rc::Rc;
 
+use base64::engine::{general_purpose::STANDARD as b64, Engine};
 use gloo::file::callbacks::FileReader;
 use gloo::file::File;
 use web_sys::{DragEvent, Event, FileList, HtmlInputElement};
@@ -182,7 +183,7 @@ impl App {
             &img.data
         };
         html! {
-            <img src={format!("data:{};base64,{}", img.file_type, base64::encode(data))} alt={img.name.clone()} />
+            <img src={format!("data:{};base64,{}", img.file_type, b64.encode(data.as_slice()))} alt={img.name.clone()} />
         }
     }
 
