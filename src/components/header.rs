@@ -6,11 +6,11 @@ pub fn header() -> Html {
     html! {
         <>
             <header>
-                <h1 class="sr-only">{ "ReCoder" }</h1>
-                <img src="assets/recoder-logo.png" />
+                <h1 class="sr-only">{ "Pixel Sorter" }</h1>
+                <img src="assets/pixel-sorter-logo.png" />
             </header>
             <p class="site-description">
-                { "A simple tool for text encoding, decoding, and hashing. 100% client-side." }
+                { "Sort pixels to get glitchy effects! No uploads, runs in browser." }
             </p>
         </>
     }

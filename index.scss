@@ -31,12 +31,12 @@ img {
   --font-family-sans: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
   --font-family-mono: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
 
-  --color-primary: hsl(167, 58%, 36%);
-  --color-primary-l: hsl(167, 45%, 47%);
-  --color-primary-d: hsl(165, 73%, 25%);
-  --color-secondary: hsl(0, 85%, 64%);
-  --color-secondary-l: hsl(0, 60%, 72%);
-  --color-secondary-d: hsl(0, 75%, 57%);
+  --color-primary: #FF220C;
+  --color-primary-l: #FF220C;
+  --color-primary-d: #D33E43;
+  --color-secondary: #1C1F33;
+  --color-secondary-l: #666370;
+  --color-secondary-d: #1C1F33;
   --color-body-bg: hsl(37, 35%, 93%);
   --color-body-fg: hsl(0, 0%, 0%);
   --color-body-fg-quiet: hsl(0, 0%, 27%);
@@ -57,12 +57,12 @@ img {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-primary: hsl(167, 58%, 30%);
-    --color-primary-l: hsl(167, 45%, 43%);
-    --color-primary-d: hsl(165, 73%, 20%);
-    --color-secondary: hsl(8, 70%, 47%);
-    --color-secondary-l: hsl(8, 60%, 54%);
-    --color-secondary-d: hsl(8, 75%, 38%);
+    --color-primary: #FF220C;
+    --color-primary-l: #FF220C;
+    --color-primary-d: #D33E43;
+    --color-secondary: #1C1F33;
+    --color-secondary-l: #666370;
+    --color-secondary-d: #1C1F33;
     --color-body-bg: hsl(30, 3%, 15%);
     --color-body-fg: hsl(0, 0%, 80%);
     --color-body-fg-quiet: hsl(0, 0%, 65%);
@@ -100,7 +100,7 @@ a, a:visited {
 
 header {
   text-align: center;
-  background-color: var(--color-primary);
+  background-color: var(--color-primary-d);
   color: var(--color-primary-fg);
   padding: 16px;
   box-shadow: 0 0 8px 3px hsla(0, 0%, 0%, 0.25);
