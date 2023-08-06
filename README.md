@@ -2,7 +2,7 @@
 
 Implementation of image pixel sorting using WebAssembly in a web worker.
 
-Here's a [summary of what pixel sorting is](http://satyarth.me/articles/pixel-sorting/).
+For explanation and credits see this [summary of what pixel sorting is](http://satyarth.me/articles/pixel-sorting/).
 
 ![Example image with sorted pixels](assets/example.jpg)
 
