@@ -1,6 +1,6 @@
-# Pixel Sorter
+# Pixel Sorter (WIP)
 
-Implementation of image pixel sorting using WebAssembly in a web worker.
+A web app for image pixel sorting using WebAssembly in a web worker.
 
 For explanation and credits see this [summary of what pixel sorting is](http://satyarth.me/articles/pixel-sorting/).
 
