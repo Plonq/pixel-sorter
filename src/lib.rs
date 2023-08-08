@@ -169,7 +169,8 @@ impl Component for App {
                 <main class="main">
                     <div class={classes!("controls-container")}>
                         <div class={classes!("controls")}>
-                            <div
+                            <label
+                                for="file-upload"
                                 class={classes!("drop-container")}
                                 ondrop={ctx.link().callback(|event: DragEvent| {
                                     event.prevent_default();
@@ -183,11 +184,11 @@ impl Component for App {
                                     event.prevent_default();
                                 })}
                             >
-                                <Icon icon_id={IconId::LucideUpload} />
+                                <Icon icon_id={IconId::LucideImagePlus} />
                                 <p>{"Drop your image here or click to select"}</p>
-                            </div>
                             <input
                                 id="file-upload"
+                                class="sr-only"
                                 type="file"
                                 accept="image/*"
                                 onchange={ctx.link().callback(move |e: Event| {
@@ -195,6 +196,7 @@ impl Component for App {
                                     Self::load_image(input.files())
                                 })}
                             />
+                            </label>
                             <div class={classes!("threshold")}>
                                 <label>
                                     { "Lower threshold: "}
