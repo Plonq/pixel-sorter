@@ -1,7 +1,7 @@
-use image::ImageFormat;
-use log::info;
-use serde::{Deserialize, Serialize};
 use std::io::{BufWriter, Cursor, Write};
+
+use image::ImageFormat;
+use serde::{Deserialize, Serialize};
 use yew_agent::{HandlerId, Public, WorkerLink};
 
 use crate::img;
@@ -17,8 +17,16 @@ pub struct WorkerInput {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct WorkerOutput {
-    pub img_data: Vec<u8>,
+pub enum WorkerStatus {
+    Decoding,
+    Sorting,
+    Encoding,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum WorkerOutput {
+    StatusUpdate(WorkerStatus),
+    Result(Vec<u8>),
 }
 
 impl yew_agent::Worker for Worker {
@@ -36,27 +44,22 @@ impl yew_agent::Worker for Worker {
     }
 
     fn handle_input(&mut self, msg: Self::Input, id: HandlerId) {
-        let sorted = load_and_sort_img_to_b64(&msg);
-        let output = Self::Output { img_data: sorted };
-
-        self.link.respond(id, output)
+        self.link
+            .respond(id, WorkerOutput::StatusUpdate(WorkerStatus::Decoding));
+        let img = image::load_from_memory(msg.img_data.as_slice()).unwrap();
+        self.link
+            .respond(id, WorkerOutput::StatusUpdate(WorkerStatus::Sorting));
+        let img = img::sort_img(img, msg.settings.clone());
+        let mut buf: BufWriter<Cursor<Vec<u8>>> = BufWriter::new(Cursor::new(vec![]));
+        self.link
+            .respond(id, WorkerOutput::StatusUpdate(WorkerStatus::Encoding));
+        img.write_to(&mut buf, ImageFormat::Jpeg).unwrap();
+        buf.flush().unwrap();
+        let sorted = buf.get_ref().to_owned().into_inner();
+        self.link.respond(id, WorkerOutput::Result(sorted))
     }
 
     fn name_of_resource() -> &'static str {
         "worker.js"
     }
-}
-
-fn load_and_sort_img_to_b64(input: &WorkerInput) -> Vec<u8> {
-    info!("Decoding image");
-    let img = image::load_from_memory(input.img_data.as_slice()).unwrap();
-    info!("Sorting pixels");
-    let img = img::sort_img(img, input.settings.clone());
-    let mut buf: BufWriter<Cursor<Vec<u8>>> = BufWriter::new(Cursor::new(vec![]));
-    // This takes the longest (especially if Png)
-    info!("Encoding image");
-    img.write_to(&mut buf, ImageFormat::Jpeg).unwrap();
-    buf.flush().unwrap();
-    info!("Done");
-    buf.get_ref().to_owned().into_inner()
 }

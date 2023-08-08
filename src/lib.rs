@@ -10,7 +10,7 @@ use yew::{html, Callback, Component, Context, Html};
 use yew_agent::{Bridge, Bridged};
 use yew_icons::{Icon, IconId};
 
-use crate::agent::{Worker, WorkerInput, WorkerOutput};
+use crate::agent::{Worker, WorkerInput, WorkerOutput, WorkerStatus};
 use crate::components::Header;
 
 pub mod agent;
@@ -45,6 +45,7 @@ pub struct App {
     sort_settings: img::SortSettings,
     // Worker
     worker: Box<dyn Bridge<Worker>>,
+    worker_status: Option<WorkerStatus>,
 }
 
 impl Component for App {
@@ -62,13 +63,14 @@ impl Component for App {
             img: None,
             img_reader: None,
             loading: false,
-            worker,
             sort_settings: img::SortSettings {
                 lower_threshold: 50,
                 upper_threshold: 150,
                 direction: img::Direction::Horizontal,
                 order: img::Order::Ascending,
             },
+            worker,
+            worker_status: None,
         }
     }
 
@@ -144,8 +146,16 @@ impl Component for App {
             Msg::WorkerMsg(output) => {
                 // the worker is done!
                 if let Some(img) = &mut self.img {
-                    img.sorted_data = Some(output.img_data);
-                    self.loading = false;
+                    match output {
+                        WorkerOutput::StatusUpdate(status) => {
+                            self.worker_status = Some(status);
+                        }
+                        WorkerOutput::Result(img_data) => {
+                            img.sorted_data = Some(img_data);
+                            self.loading = false;
+                            self.worker_status = None;
+                        }
+                    }
                 }
                 true
             }
@@ -173,7 +183,7 @@ impl Component for App {
                                     event.prevent_default();
                                 })}
                             >
-                                <Icon icon_id={IconId::FeatherUpload} />
+                                <Icon icon_id={IconId::LucideUpload} />
                                 <p>{"Drop your image here or click to select"}</p>
                             </div>
                             <input
@@ -257,15 +267,25 @@ impl Component for App {
                             </div>
                         </div>
                     </div>
-                    <div class={classes!("output")}>
-                        if self.loading {
-                            <div>{"Loading..."}</div>
+                    <div class={classes!("output", "overlay-container")}>
+                        if let Some(img_details) = &self.img {
+                            { Self::view_img(img_details) }
                         } else {
-                            if let Some(img_details) = &self.img {
-                                { Self::view_img(img_details) }
-                            } else {
-                                <div class={classes!("placeholder")}>{"Open an image to get started"}</div>
-                            }
+                            <div class={classes!("placeholder")}>{"Open an image to get started"}</div>
+                        }
+                        if self.worker_status.is_some() {
+                            <div class={classes!("overlay")}>
+                                <div class={classes!("content")}>
+                                    <Icon icon_id={IconId::LucideLoader} />
+                                    if let Some(status) = &self.worker_status {
+                                        {match status {
+                                            WorkerStatus::Decoding => {"Decoding image..."},
+                                            WorkerStatus::Sorting => {"Sorting the pixels..."},
+                                            WorkerStatus::Encoding => {"Encoding the image..."},
+                                        }}
+                                    }
+                                </div>
+                            </div>
                         }
                     </div>
                 </main>

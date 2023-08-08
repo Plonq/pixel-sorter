@@ -216,9 +216,15 @@ main {
     > .content {
       margin: auto;
       line-height: 1.5em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      svg {
+        animation: rotate infinite 1s;
+      }
     }
   }
-
 }
 
 
@@ -257,4 +263,13 @@ main {
   position: absolute;
   white-space: nowrap;
   width: 1px;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(180deg);
+  }
 }
