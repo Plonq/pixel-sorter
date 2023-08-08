@@ -11,7 +11,7 @@ use yew_agent::{Bridge, Bridged};
 use yew_icons::{Icon, IconId};
 
 use crate::agent::{Worker, WorkerInput, WorkerOutput, WorkerStatus};
-use crate::components::Header;
+use crate::components::{Button, ButtonStyle, Header};
 
 pub mod agent;
 mod components;
@@ -265,14 +265,13 @@ impl Component for App {
                             </div>
                             <div class={classes!("button-row")}>
                                 // <button type="button" class="btn" onclick={ctx.link().callback(|_| Msg::LoadImage(None))}>{"Reset"}</button>
-                                <button
-                                    type="button"
-                                    class="btn primary"
+                                <Button
+                                    style={ButtonStyle::Primary}
                                     disabled={self.worker_status.is_some() || self.img.is_none()}
                                     onclick={ctx.link().callback(|_| Msg::RunWorker)}
                                 >
-                                    {"Sort!"}
-                                </button>
+                                    { "Sort!" }
+                                </Button>
                             </div>
                         </div>
                     </div>
