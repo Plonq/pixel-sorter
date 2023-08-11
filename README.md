@@ -1,4 +1,4 @@
-# Pixel Sorter (WIP)
+# Pixel Sorter
 
 A web app for image pixel sorting using WebAssembly in a web worker.
 
