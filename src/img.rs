@@ -1,4 +1,4 @@
-use image::{DynamicImage, GenericImage, GenericImageView, ImageBuffer, Pixel, Rgba};
+use image::{DynamicImage, GenericImageView, ImageBuffer, Pixel, Rgba};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, PartialEq, Clone)]
