@@ -98,7 +98,6 @@ impl Component for App {
                     self.img = None;
                     self.img_reader = None;
                 }
-                true
             }
             Msg::ImageLoaded(file_name, file_type, data) => {
                 self.img = Some(ImageDetails {
@@ -109,29 +108,24 @@ impl Component for App {
                 });
                 self.img_reader = None;
                 self.loading = false;
-                true
             }
             Msg::SetLowerThreshold(value) => {
                 self.sort_settings.lower_threshold = value;
                 if self.sort_settings.upper_threshold <= self.sort_settings.lower_threshold {
                     self.sort_settings.upper_threshold = self.sort_settings.lower_threshold;
                 }
-                true
             }
             Msg::SetUpperThreshold(value) => {
                 self.sort_settings.upper_threshold = value;
                 if self.sort_settings.lower_threshold >= self.sort_settings.upper_threshold {
                     self.sort_settings.lower_threshold = self.sort_settings.upper_threshold;
                 }
-                true
             }
             Msg::SetDirection(direction) => {
                 self.sort_settings.direction = direction;
-                true
             }
             Msg::SetOrder(order) => {
                 self.sort_settings.order = order;
-                true
             }
             // Worker
             Msg::RunWorker => {
@@ -142,7 +136,6 @@ impl Component for App {
                         settings: self.sort_settings.clone(),
                     });
                 }
-                true
             }
             Msg::WorkerMsg(output) => {
                 // the worker is done!
@@ -158,9 +151,10 @@ impl Component for App {
                         }
                     }
                 }
-                true
             }
         }
+
+        true
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
