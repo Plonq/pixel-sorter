@@ -194,6 +194,13 @@ main {
 
 .drop-container {
   text-align: center;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
 
   svg {
     width: 48px;
