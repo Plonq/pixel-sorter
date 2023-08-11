@@ -211,12 +211,16 @@ main {
 .output {
   flex-grow: 1;
   flex-basis: 500px;
-  border: 1px solid var(--color-border);
   height: 1000px;
   max-height: 80vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px dashed var(--color-border);
+
+  &.has-image {
+    border: 0;
+  }
 
   img {
     object-fit: scale-down;
@@ -232,6 +236,7 @@ main {
 
 .overlay-container {
   position: relative;
+  display: inline-block;
 
   .overlay {
     position: absolute;
@@ -239,7 +244,6 @@ main {
     right: 0;
     bottom: 0;
     left: 0;
-    border-radius: var(--border-radius);
     background: hsla(0, 0%, 0%, 0.8);
     color: white;
     display: grid;

@@ -18,6 +18,7 @@ pub mod agent;
 mod components;
 mod img;
 
+#[derive(Clone, Debug, Default)]
 struct ImageDetails {
     name: String,
     file_type: String,
@@ -247,9 +248,9 @@ impl Component for App {
                             </div>
                         </div>
                     </div>
-                    <div class={classes!("output", "overlay-container")}>
+                    <div class={classes!("output", self.img.clone().map(|_| Some("has-image")))}>
                         if let Some(img_details) = &self.img {
-                            { Self::view_img(img_details) }
+                            { self.view_img(img_details) }
                         } else {
                             <label
                                 for="file-upload"
@@ -280,20 +281,6 @@ impl Component for App {
                                 />
                             </label>
                         }
-                        if self.worker_status.is_some() {
-                            <div class={classes!("overlay")}>
-                                <div class={classes!("content")}>
-                                    <Icon icon_id={IconId::LucideLoader} />
-                                    if let Some(status) = &self.worker_status {
-                                        {match status {
-                                            WorkerStatus::Decoding => {"Decoding image..."},
-                                            WorkerStatus::Sorting => {"Sorting the pixels..."},
-                                            WorkerStatus::Encoding => {"Encoding the image..."},
-                                        }}
-                                    }
-                                </div>
-                            </div>
-                        }
                     </div>
                 </main>
                 <footer class="footer">
@@ -307,7 +294,7 @@ impl Component for App {
 }
 
 impl App {
-    fn view_img(img: &ImageDetails) -> Html {
+    fn view_img(&self, img: &ImageDetails) -> Html {
         let (data, file_type) = if let Some(sorted) = &img.sorted_data {
             // Sorted image is always jpeg (png encoding is really slow)
             (sorted, "image/jpeg".to_string())
@@ -315,7 +302,23 @@ impl App {
             (&img.data, img.file_type.clone())
         };
         html! {
-            <img src={format!("data:{};base64,{}", file_type, b64.encode(data.as_slice()))} alt={img.name.clone()} />
+            <div class="overlay-container">
+                <img src={format!("data:{};base64,{}", file_type, b64.encode(data.as_slice()))} alt={img.name.clone()} />
+                if self.worker_status.is_some() {
+                    <div class={classes!("overlay")}>
+                        <div class={classes!("content")}>
+                            <Icon icon_id={IconId::LucideLoader} />
+                            if let Some(status) = &self.worker_status {
+                                {match status {
+                                    WorkerStatus::Decoding => {"Decoding image..."},
+                                    WorkerStatus::Sorting => {"Sorting the pixels..."},
+                                    WorkerStatus::Encoding => {"Encoding the image..."},
+                                }}
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
         }
     }
 
