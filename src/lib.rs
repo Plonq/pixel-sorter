@@ -12,6 +12,7 @@ use yew_icons::{Icon, IconId};
 
 use crate::agent::{Worker, WorkerInput, WorkerOutput, WorkerStatus};
 use crate::components::{Button, ButtonStyle, Header};
+use crate::img::{Direction, Order, SortSettings};
 
 pub mod agent;
 mod components;
@@ -30,8 +31,8 @@ pub enum Msg {
     ImageLoaded(String, String, Vec<u8>),
     SetLowerThreshold(u8),
     SetUpperThreshold(u8),
-    SetDirection(img::Direction),
-    SetOrder(img::Order),
+    SetDirection(Direction),
+    SetOrder(Order),
     // Worker
     RunWorker,
     WorkerMsg(WorkerOutput),
@@ -42,7 +43,7 @@ pub struct App {
     img: Option<ImageDetails>,
     img_reader: Option<FileReader>,
     loading: bool,
-    sort_settings: img::SortSettings,
+    sort_settings: SortSettings,
     // Worker
     worker: Box<dyn Bridge<Worker>>,
     worker_status: Option<WorkerStatus>,
@@ -63,11 +64,11 @@ impl Component for App {
             img: None,
             img_reader: None,
             loading: false,
-            sort_settings: img::SortSettings {
+            sort_settings: SortSettings {
                 lower_threshold: 50,
                 upper_threshold: 150,
-                direction: img::Direction::Horizontal,
-                order: img::Order::Ascending,
+                direction: Direction::Horizontal,
+                order: Order::Ascending,
             },
             worker,
             worker_status: None,
