@@ -164,37 +164,10 @@ impl Component for App {
                 <main class="main">
                     <div class={classes!("controls-container")}>
                         <div class={classes!("controls")}>
-                            <label
-                                for="file-upload"
-                                class={classes!("drop-container")}
-                                ondrop={ctx.link().callback(|event: DragEvent| {
-                                    event.prevent_default();
-                                    let files = event.data_transfer().unwrap().files();
-                                    Self::load_image(files)
-                                })}
-                                ondragover={Callback::from(|event: DragEvent| {
-                                    event.prevent_default();
-                                })}
-                                ondragenter={Callback::from(|event: DragEvent| {
-                                    event.prevent_default();
-                                })}
-                            >
-                                <Icon icon_id={IconId::LucideImagePlus} />
-                                <p>{"Drop your image here or click to select"}</p>
-                            <input
-                                id="file-upload"
-                                class="sr-only"
-                                type="file"
-                                accept="image/*"
-                                onchange={ctx.link().callback(move |e: Event| {
-                                    let input: HtmlInputElement = e.target_unchecked_into();
-                                    Self::load_image(input.files())
-                                })}
-                            />
-                            </label>
-                            <div class={classes!("threshold")}>
+                            <fieldset class={classes!("threshold")}>
+                                <legend title="This mask determines which pixels will be sorted. Pixels brighter than the lower threshold and darker than the upper threshold will be sorted.">{ "Image mask" }</legend>
                                 <label>
-                                    { "Lower threshold: "}
+                                    <span>{ "Lower threshold: "}</span>
                                     <input
                                         id="lower-threshold"
                                         type="range"
@@ -205,10 +178,10 @@ impl Component for App {
                                             Msg::SetLowerThreshold(e.target_unchecked_into::<HtmlInputElement>().value().parse::<u8>().unwrap())
                                         })}
                                     />
-                                    { self.sort_settings.lower_threshold }
+                                    <span>{ self.sort_settings.lower_threshold }</span>
                                 </label>
                                 <label>
-                                    { "Upper threshold: "}
+                                    <span>{ "Upper threshold: "}</span>
                                     <input
                                         id="upper-threshold"
                                         type="range"
@@ -219,9 +192,9 @@ impl Component for App {
                                             Msg::SetUpperThreshold(e.target_unchecked_into::<HtmlInputElement>().value().parse::<u8>().unwrap())
                                         })}
                                     />
-                                    { self.sort_settings.upper_threshold }
+                                    <span>{ self.sort_settings.upper_threshold }</span>
                                 </label>
-                            </div>
+                            </fieldset>
                             <div class={classes!("direction")}>
                                 <label>
                                     <input
@@ -274,7 +247,34 @@ impl Component for App {
                         if let Some(img_details) = &self.img {
                             { Self::view_img(img_details) }
                         } else {
-                            <div class={classes!("placeholder")}>{"Open an image to get started"}</div>
+                            <label
+                                for="file-upload"
+                                class={classes!("placeholder", "drop-container")}
+                                ondrop={ctx.link().callback(|event: DragEvent| {
+                                    event.prevent_default();
+                                    let files = event.data_transfer().unwrap().files();
+                                    Self::load_image(files)
+                                })}
+                                ondragover={Callback::from(|event: DragEvent| {
+                                    event.prevent_default();
+                                })}
+                                ondragenter={Callback::from(|event: DragEvent| {
+                                    event.prevent_default();
+                                })}
+                            >
+                                <Icon icon_id={IconId::LucideImagePlus} />
+                                <p>{"Drop your image here or click to select"}</p>
+                                <input
+                                    id="file-upload"
+                                    class="sr-only"
+                                    type="file"
+                                    accept="image/*"
+                                    onchange={ctx.link().callback(move |e: Event| {
+                                        let input: HtmlInputElement = e.target_unchecked_into();
+                                        Self::load_image(input.files())
+                                    })}
+                                />
+                            </label>
                         }
                         if self.worker_status.is_some() {
                             <div class={classes!("overlay")}>
