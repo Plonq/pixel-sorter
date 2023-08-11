@@ -166,8 +166,8 @@ impl Component for App {
                         <div class={classes!("controls")}>
                             <fieldset class={classes!("threshold")}>
                                 <legend title="This mask determines which pixels will be sorted. Pixels brighter than the lower threshold and darker than the upper threshold will be sorted.">{ "Image mask" }</legend>
-                                <label>
-                                    <span>{ "Lower threshold: "}</span>
+                                <div class="threshold-grid">
+                                    <label for="lower-threshold">{ "Lower threshold: "}</label>
                                     <input
                                         id="lower-threshold"
                                         type="range"
@@ -179,9 +179,7 @@ impl Component for App {
                                         })}
                                     />
                                     <span>{ self.sort_settings.lower_threshold }</span>
-                                </label>
-                                <label>
-                                    <span>{ "Upper threshold: "}</span>
+                                    <label for="upper-threshold">{ "Upper threshold: "}</label>
                                     <input
                                         id="upper-threshold"
                                         type="range"
@@ -193,44 +191,50 @@ impl Component for App {
                                         })}
                                     />
                                     <span>{ self.sort_settings.upper_threshold }</span>
-                                </label>
+                                </div>
                             </fieldset>
-                            <div class={classes!("direction")}>
-                                <label>
-                                    <input
-                                        type="radio"
-                                        checked={self.sort_settings.direction == img::Direction::Horizontal}
-                                        onchange={ctx.link().callback(|_: Event| Msg::SetDirection(img::Direction::Horizontal))}
-                                    />
-                                    {"Horizontal"}
-                                </label>
-                                <label>
-                                    <input
-                                        type="radio"
-                                        checked={self.sort_settings.direction == img::Direction::Vertical}
-                                        onchange={ctx.link().callback(|_: Event| Msg::SetDirection(img::Direction::Vertical))}
-                                    />
-                                    {"Vertical"}
-                                </label>
-                            </div>
-                            <div class={classes!("order")}>
-                                <label>
-                                    <input
-                                        type="radio"
-                                        checked={self.sort_settings.order == img::Order::Ascending}
-                                        onchange={ctx.link().callback(|_: Event| Msg::SetOrder(img::Order::Ascending))}
-                                    />
-                                    {"Ascending"}
-                                </label>
-                                <label>
-                                    <input
-                                        type="radio"
-                                        checked={self.sort_settings.order == img::Order::Descending}
-                                        onchange={ctx.link().callback(|_: Event| Msg::SetOrder(img::Order::Descending))}
-                                    />
-                                    {"Descending"}
-                                </label>
-                            </div>
+                            <fieldset class={classes!("direction")}>
+                                <legend>{ "Sort Direction" }</legend>
+                                <div class="custom-radio-group">
+                                    <label class="custom-radio">
+                                        <input
+                                            type="radio"
+                                            checked={self.sort_settings.direction == img::Direction::Horizontal}
+                                            onchange={ctx.link().callback(|_: Event| Msg::SetDirection(img::Direction::Horizontal))}
+                                        />
+                                        <span>{"Horizontal"}</span>
+                                    </label>
+                                    <label class="custom-radio">
+                                        <input
+                                            type="radio"
+                                            checked={self.sort_settings.direction == img::Direction::Vertical}
+                                            onchange={ctx.link().callback(|_: Event| Msg::SetDirection(img::Direction::Vertical))}
+                                        />
+                                        <span>{"Vertical"}</span>
+                                    </label>
+                                </div>
+                            </fieldset>
+                            <fieldset class={classes!("order")}>
+                                <legend>{ "Sort Order" }</legend>
+                                <div class="custom-radio-group">
+                                    <label class="custom-radio">
+                                        <input
+                                            type="radio"
+                                            checked={self.sort_settings.order == img::Order::Ascending}
+                                            onchange={ctx.link().callback(|_: Event| Msg::SetOrder(img::Order::Ascending))}
+                                        />
+                                        <span>{"Ascending"}</span>
+                                    </label>
+                                    <label class="custom-radio">
+                                        <input
+                                            type="radio"
+                                            checked={self.sort_settings.order == img::Order::Descending}
+                                            onchange={ctx.link().callback(|_: Event| Msg::SetOrder(img::Order::Descending))}
+                                        />
+                                        <span>{"Descending"}</span>
+                                    </label>
+                                </div>
+                            </fieldset>
                             <div class={classes!("button-row")}>
                                 // <button type="button" class="btn" onclick={ctx.link().callback(|_| Msg::LoadImage(None))}>{"Reset"}</button>
                                 <Button
