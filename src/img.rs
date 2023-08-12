@@ -1,3 +1,5 @@
+use std::io::{BufReader, Cursor};
+
 use image::{DynamicImage, GenericImageView, ImageBuffer, Pixel, Rgba};
 use serde::{Deserialize, Serialize};
 
@@ -104,4 +106,21 @@ pub fn sort_img(img: DynamicImage, settings: SortSettings) -> ImageBuffer<Rgba<u
     }
 
     output
+}
+
+pub fn get_orientation(img_data: &Vec<u8>) -> Option<u32> {
+    let cursor = Cursor::new(img_data);
+    let mut file_reader = BufReader::new(cursor);
+    let exifreader = exif::Reader::new();
+    if let Ok(exif_data) = exifreader.read_from_container(&mut file_reader) {
+        match exif_data.get_field(exif::Tag::Orientation, exif::In::PRIMARY) {
+            Some(orientation) => match orientation.value.get_uint(0) {
+                Some(v @ 1..=8) => Some(v),
+                _ => None,
+            },
+            None => None,
+        }
+    } else {
+        None
+    }
 }

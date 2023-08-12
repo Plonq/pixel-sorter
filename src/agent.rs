@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use yew_agent::{HandlerId, Public, WorkerLink};
 
 use crate::img;
+use crate::img::get_orientation;
 
 pub struct Worker {
     link: WorkerLink<Self>,
@@ -46,7 +47,16 @@ impl yew_agent::Worker for Worker {
     fn handle_input(&mut self, msg: Self::Input, id: HandlerId) {
         self.link
             .respond(id, WorkerOutput::StatusUpdate(WorkerStatus::Decoding));
-        let img = image::load_from_memory(msg.img_data.as_slice()).unwrap();
+        let mut img = image::load_from_memory(msg.img_data.as_slice()).unwrap();
+        if let Some(orientation) = get_orientation(&msg.img_data) {
+            img = match orientation {
+                3 => img.rotate180(),
+                6 => img.rotate90(),
+                8 => img.rotate270(),
+                _ => img,
+            };
+        }
+
         self.link
             .respond(id, WorkerOutput::StatusUpdate(WorkerStatus::Sorting));
         let img = img::sort_img(img, msg.settings.clone());
