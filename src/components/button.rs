@@ -5,6 +5,7 @@ pub enum Style {
     #[default]
     Standard,
     Primary,
+    Borderless,
 }
 
 #[derive(Properties, PartialEq)]
@@ -25,9 +26,11 @@ pub fn button(props: &Props) -> Html {
     let disabled = props.disabled;
 
     let mut class = vec!["btn"];
-    if props.style == Style::Primary {
-        class.push("primary");
-    }
+    class.push(match props.style {
+        Style::Primary => "primary",
+        Style::Borderless => "borderless",
+        _ => "",
+    });
 
     let button_type = if props.submit { "submit" } else { "button" };
 

@@ -1,14 +1,16 @@
 use image::{DynamicImage, GenericImageView, ImageBuffer, Pixel, Rgba};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Clone, Default)]
 pub enum Direction {
+    #[default]
     Horizontal,
     Vertical,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Clone, Default)]
 pub enum Order {
+    #[default]
     Ascending,
     Descending,
 }
@@ -19,6 +21,17 @@ pub struct SortSettings {
     pub upper_threshold: u8,
     pub direction: Direction,
     pub order: Order,
+}
+
+impl Default for SortSettings {
+    fn default() -> Self {
+        SortSettings {
+            lower_threshold: 50,
+            upper_threshold: 150,
+            direction: Direction::Horizontal,
+            order: Order::Ascending,
+        }
+    }
 }
 
 pub fn sort_img(img: DynamicImage, settings: SortSettings) -> ImageBuffer<Rgba<u8>, Vec<u8>> {

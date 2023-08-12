@@ -34,6 +34,7 @@ pub enum Msg {
     SetUpperThreshold(u8),
     SetDirection(Direction),
     SetOrder(Order),
+    Reset,
     // Worker
     RunWorker,
     WorkerMsg(WorkerOutput),
@@ -65,12 +66,7 @@ impl Component for App {
             img: None,
             img_reader: None,
             loading: false,
-            sort_settings: SortSettings {
-                lower_threshold: 50,
-                upper_threshold: 150,
-                direction: Direction::Horizontal,
-                order: Order::Ascending,
-            },
+            sort_settings: SortSettings::default(),
             worker,
             worker_status: None,
         }
@@ -127,6 +123,11 @@ impl Component for App {
             }
             Msg::SetOrder(order) => {
                 self.sort_settings.order = order;
+            }
+            Msg::Reset => {
+                self.img = None;
+                self.img_reader = None;
+                self.sort_settings = SortSettings::default();
             }
             // Worker
             Msg::RunWorker => {
@@ -237,13 +238,19 @@ impl Component for App {
                                 </div>
                             </fieldset>
                             <div class={classes!("button-row")}>
-                                // <button type="button" class="btn" onclick={ctx.link().callback(|_| Msg::LoadImage(None))}>{"Reset"}</button>
+                                <Button
+                                    style={ButtonStyle::Borderless}
+                                    disabled={self.img.is_none()}
+                                    onclick={ctx.link().callback(|_| Msg::Reset)}
+                                >
+                                    { "Reset" }
+                                </Button>
                                 <Button
                                     style={ButtonStyle::Primary}
                                     disabled={self.worker_status.is_some() || self.img.is_none()}
                                     onclick={ctx.link().callback(|_| Msg::RunWorker)}
                                 >
-                                    { "Sort!" }
+                                    { "Sort" }
                                 </Button>
                             </div>
                         </div>
