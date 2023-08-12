@@ -211,12 +211,16 @@ main {
 .output {
   flex-grow: 1;
   flex-basis: 500px;
-  height: 1000px;
-  max-height: 80vh;
+  max-height: 50vh;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1px dashed var(--color-border);
+
+  @media (min-width: 768px) {
+    max-height: 80vh;
+    height: 800px;
+  }
 
   &.has-image {
     border: 0;
