@@ -255,24 +255,26 @@ impl Component for App {
                             </div>
                         </div>
                     </div>
-                    <div class={classes!("output", self.img.clone().map(|_| Some("has-image")))}>
+                    <div
+                        class={classes!("output", "overlay-container", self.img.is_some().then_some(Some("has-image")))}
+                        ondrop={ctx.link().callback(|event: DragEvent| {
+                            event.prevent_default();
+                            let files = event.data_transfer().unwrap().files();
+                            Self::load_image(files)
+                        })}
+                        ondragover={Callback::from(|event: DragEvent| {
+                            event.prevent_default();
+                        })}
+                        ondragenter={Callback::from(|event: DragEvent| {
+                            event.prevent_default();
+                        })}
+                    >
                         if let Some(img_details) = &self.img {
                             { self.view_img(ctx, img_details) }
                         } else {
                             <label
                                 for="file-upload"
                                 class={classes!("placeholder", "drop-container")}
-                                ondrop={ctx.link().callback(|event: DragEvent| {
-                                    event.prevent_default();
-                                    let files = event.data_transfer().unwrap().files();
-                                    Self::load_image(files)
-                                })}
-                                ondragover={Callback::from(|event: DragEvent| {
-                                    event.prevent_default();
-                                })}
-                                ondragenter={Callback::from(|event: DragEvent| {
-                                    event.prevent_default();
-                                })}
                             >
                                 <Icon icon_id={IconId::LucideImagePlus} />
                                 <p>{"Drop your image here or click to select"}</p>
@@ -309,20 +311,7 @@ impl App {
             (&img.data, img.file_type.clone())
         };
         html! {
-            <div
-                class="overlay-container"
-                ondrop={ctx.link().callback(|event: DragEvent| {
-                    event.prevent_default();
-                    let files = event.data_transfer().unwrap().files();
-                    Self::load_image(files)
-                })}
-                ondragover={Callback::from(|event: DragEvent| {
-                    event.prevent_default();
-                })}
-                ondragenter={Callback::from(|event: DragEvent| {
-                    event.prevent_default();
-                })}
-            >
+            <>
                 <img src={format!("data:{};base64,{}", file_type, b64.encode(data.as_slice()))} alt={img.name.clone()} />
                 if self.worker_status.is_some() {
                     <div class={classes!("overlay")}>
@@ -338,7 +327,7 @@ impl App {
                         </div>
                     </div>
                 }
-            </div>
+            </>
         }
     }
 
