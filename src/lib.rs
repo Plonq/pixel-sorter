@@ -270,7 +270,7 @@ impl Component for App {
                         })}
                     >
                         if let Some(img_details) = &self.img {
-                            { self.view_img(ctx, img_details) }
+                            { self.view_img(img_details) }
                         } else {
                             <label
                                 for="file-upload"
@@ -303,7 +303,7 @@ impl Component for App {
 }
 
 impl App {
-    fn view_img(&self, ctx: &Context<Self>, img: &ImageDetails) -> Html {
+    fn view_img(&self, img: &ImageDetails) -> Html {
         let (data, file_type) = if let Some(sorted) = &img.sorted_data {
             // Sorted image is always jpeg (png encoding is really slow)
             (sorted, "image/jpeg".to_string())
