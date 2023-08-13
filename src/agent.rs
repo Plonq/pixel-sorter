@@ -59,7 +59,7 @@ impl yew_agent::Worker for Worker {
 
         self.link
             .respond(id, WorkerOutput::StatusUpdate(WorkerStatus::Sorting));
-        let img = img::sort_img(img, msg.settings.clone());
+        let img = img::sort_img(img, msg.settings);
         let mut buf: BufWriter<Cursor<Vec<u8>>> = BufWriter::new(Cursor::new(vec![]));
         self.link
             .respond(id, WorkerOutput::StatusUpdate(WorkerStatus::Encoding));
