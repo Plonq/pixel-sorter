@@ -11,19 +11,19 @@ use yew_agent::{Bridge, Bridged};
 use yew_icons::{Icon, IconId};
 
 use crate::agent::{Worker, WorkerInput, WorkerOutput, WorkerStatus};
-use crate::components::{Button, ButtonStyle, Header};
+use crate::components::{Button, ButtonStyle, FullscreenImage, Header};
 use crate::img::{Direction, Order, SortSettings};
 
 pub mod agent;
 mod components;
 mod img;
 
-#[derive(Clone, Debug, Default)]
-struct ImageDetails {
-    name: String,
-    file_type: String,
-    data: Vec<u8>,
-    sorted_data: Option<Vec<u8>>,
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct ImageDetails {
+    pub name: String,
+    pub file_type: String,
+    pub data: Vec<u8>,
+    pub sorted_data: Option<Vec<u8>>,
 }
 
 pub enum Msg {
@@ -35,6 +35,7 @@ pub enum Msg {
     SetDirection(Direction),
     SetOrder(Order),
     Reset,
+    ToggleZoom,
     // Worker
     RunWorker,
     WorkerMsg(WorkerOutput),
@@ -46,6 +47,7 @@ pub struct App {
     img_reader: Option<FileReader>,
     loading: bool,
     sort_settings: SortSettings,
+    zoomed: bool,
     // Worker
     worker: Box<dyn Bridge<Worker>>,
     worker_status: Option<WorkerStatus>,
@@ -67,6 +69,7 @@ impl Component for App {
             img_reader: None,
             loading: false,
             sort_settings: SortSettings::default(),
+            zoomed: false,
             worker,
             worker_status: None,
         }
@@ -128,6 +131,9 @@ impl Component for App {
                 self.img = None;
                 self.img_reader = None;
                 self.sort_settings = SortSettings::default();
+            }
+            Msg::ToggleZoom => {
+                self.zoomed = !self.zoomed;
             }
             // Worker
             Msg::RunWorker => {
@@ -270,7 +276,10 @@ impl Component for App {
                         })}
                     >
                         if let Some(img_details) = &self.img {
-                            { self.view_img(img_details) }
+                            { self.view_img(ctx, img_details) }
+                            if self.zoomed {
+                                <FullscreenImage img_details={img_details.clone()} onclose={ctx.link().callback(|_| Msg::ToggleZoom)} />
+                            }
                         } else {
                             <label
                                 for="file-upload"
@@ -303,7 +312,7 @@ impl Component for App {
 }
 
 impl App {
-    fn view_img(&self, img: &ImageDetails) -> Html {
+    fn view_img(&self, ctx: &Context<Self>, img: &ImageDetails) -> Html {
         let (data, file_type) = if let Some(sorted) = &img.sorted_data {
             // Sorted image is always jpeg (png encoding is really slow)
             (sorted, "image/jpeg".to_string())
@@ -312,7 +321,11 @@ impl App {
         };
         html! {
             <>
-                <img src={format!("data:{};base64,{}", file_type, b64.encode(data.as_slice()))} alt={img.name.clone()} />
+                <img
+                    onclick={ctx.link().callback(|_| Msg::ToggleZoom)}
+                    src={format!("data:{};base64,{}", file_type, b64.encode(data.as_slice()))}
+                    alt={img.name.clone()}
+                />
                 if self.worker_status.is_some() {
                     <div class={classes!("overlay")}>
                         <div class={classes!("content")}>
