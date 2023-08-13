@@ -147,6 +147,8 @@ main {
   width: 100%;
   display: flex;
   flex-direction: column-reverse;
+  justify-content: center;
+  align-items: center;
   gap: 24px;
   padding: 24px 24px 48px;
 
@@ -157,7 +159,6 @@ main {
 
 .controls-container {
   flex-basis: 40%;
-  flex-grow: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -209,18 +210,19 @@ main {
 }
 
 .output {
-  flex-grow: 1;
   min-height: 200px;
   max-height: 50vh;
+  height: 300px;
+  width: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1px dashed var(--color-border);
 
-  @media (min-width: 768px) {
+  @media (min-width: 1280px) {
     max-height: 80vh;
-    height: 800px;
-    flex-basis: 500px;
+    height: 600px;
+    width: 600px;
   }
 
   &.has-image {
@@ -241,8 +243,6 @@ main {
 
 .overlay-container {
   position: relative;
-  //height: 100%;
-  //width: 100%;
 
   .overlay {
     position: absolute;
