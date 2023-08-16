@@ -4,8 +4,8 @@ use yew::prelude::*;
 pub enum Style {
     #[default]
     Standard,
-    Primary,
-    Borderless,
+    // Primary,
+    // Borderless,
 }
 
 #[derive(Properties, PartialEq)]
@@ -25,12 +25,12 @@ pub fn button(props: &Props) -> Html {
     let onclick = props.onclick.clone();
     let disabled = props.disabled;
 
-    let mut class = vec!["btn"];
-    class.push(match props.style {
-        Style::Primary => "primary",
-        Style::Borderless => "borderless",
-        _ => "",
-    });
+    let class = vec!["btn"];
+    // class.push(match props.style {
+    //     Style::Primary => "primary",
+    //     Style::Borderless => "borderless",
+    //     _ => "",
+    // });
 
     let button_type = if props.submit { "submit" } else { "button" };
 

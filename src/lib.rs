@@ -36,6 +36,7 @@ pub enum Msg {
     SettingsChanged,
     ToggleShowOriginal,
     Reset,
+    ClearImage,
     ToggleZoom,
     // Worker
     RunWorker,
@@ -138,6 +139,9 @@ impl Component for App {
             Msg::Reset => {
                 self.sort_settings = SortSettings::default();
                 ctx.link().send_message(Msg::RunWorker);
+            }
+            Msg::ClearImage => {
+                self.img = None;
             }
             Msg::ToggleZoom => {
                 self.zoomed = !self.zoomed;
@@ -263,9 +267,15 @@ impl Component for App {
                                         </div>
                                         <span>{ "Show original" }</span>
                                     </label>
+                                    <Button
+                                        disabled={self.worker_status.is_some()}
+                                        onclick={ctx.link().callback(|_| Msg::ClearImage)}
+                                    >
+                                        { "Clear Image" }
+                                    </Button>
                                 }
                                 <Button
-                                    style={ButtonStyle::Borderless}
+                                    disabled={self.worker_status.is_some()}
                                     onclick={ctx.link().callback(|_| Msg::Reset)}
                                 >
                                     { "Reset" }
