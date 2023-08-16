@@ -83,6 +83,7 @@ impl Component for App {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::LoadImage(file) => {
+                self.sorted_data = None;
                 if let Some(file) = file {
                     let file_name = file.name();
                     let file_type = file.raw_mime_type();
@@ -250,17 +251,19 @@ impl Component for App {
                                 </div>
                             </fieldset>
                             <div class={classes!("button-row")}>
-                                <label class="custom-checkbox">
-                                    <div class="box">
-                                        <input
-                                            type="checkbox"
-                                            checked={self.show_original}
-                                            onchange={ctx.link().callback(|_: Event| Msg::ToggleShowOriginal)}
-                                        />
-                                        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>
-                                    </div>
-                                    <span>{ "Show original" }</span>
-                                </label>
+                                if self.img.is_some() {
+                                    <label class="custom-checkbox">
+                                        <div class="box">
+                                            <input
+                                                type="checkbox"
+                                                checked={self.show_original}
+                                                onchange={ctx.link().callback(|_: Event| Msg::ToggleShowOriginal)}
+                                            />
+                                            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>
+                                        </div>
+                                        <span>{ "Show original" }</span>
+                                    </label>
+                                }
                                 <Button
                                     style={ButtonStyle::Borderless}
                                     onclick={ctx.link().callback(|_| Msg::Reset)}
