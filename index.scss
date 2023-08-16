@@ -150,24 +150,26 @@ main {
   flex-direction: column-reverse;
   justify-content: center;
   align-items: center;
-  gap: 24px;
+  gap: 40px;
   padding: 24px 24px 48px;
 
-  @media (min-width: 1280px) {
+  @media (min-width: 1100px) {
     flex-direction: row;
   }
 }
 
 .controls-container {
-  flex-basis: 40%;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 400px;
+  max-width: 100%;
 
   .controls {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    width: 100%;
 
     .threshold {
       display: flex;
@@ -176,12 +178,12 @@ main {
 
       .threshold-grid {
         display: grid;
-        grid-template-rows: 1fr;
+        grid-template-columns: min-content auto max-content;
+        place-items: center;
         gap: 8px;
 
-        @media (min-width: 440px) {
-          grid-template-columns: 4fr 8fr 1fr;
-          place-items: center;
+        label {
+          white-space: nowrap;
         }
       }
     }
@@ -222,7 +224,13 @@ main {
   justify-content: center;
   border: 1px dashed var(--color-border);
 
-  @media (min-width: 1280px) {
+  @media (min-width: 800px) {
+    max-height: 70vh;
+    height: 400px;
+    width: 500px;
+  }
+
+  @media (min-width: 1100px) {
     max-height: 80vh;
     height: 600px;
     width: 600px;
@@ -288,7 +296,7 @@ main {
   background: rgba(0, 0, 0, 0.85);
   cursor: zoom-out;
 
-  @media (min-width: 1280px) {
+  @media (min-width: 1100px) {
     padding: 80px;
   }
 
@@ -408,7 +416,8 @@ input[type="range"] {
   appearance: none;
   background: transparent;
   cursor: pointer;
-  width: 15rem;
+  width: 100%;
+  max-width: 15rem;
 }
 
 input[type="range"] {
@@ -526,6 +535,7 @@ fieldset {
 .custom-checkbox {
   display: grid;
   grid-template-columns: 1em auto;
+  place-items: center;
   gap: 0.5em;
   cursor: pointer;
 
