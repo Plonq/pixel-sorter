@@ -23,7 +23,6 @@ pub struct ImageDetails {
     pub name: String,
     pub file_type: String,
     pub data: Vec<u8>,
-    pub sorted_data: Option<Vec<u8>>,
 }
 
 pub enum Msg {
@@ -34,6 +33,8 @@ pub enum Msg {
     SetUpperThreshold(u8),
     SetDirection(Direction),
     SetOrder(Order),
+    SettingsChanged,
+    ToggleShowOriginal,
     Reset,
     ToggleZoom,
     // Worker
@@ -45,14 +46,17 @@ pub struct App {
     // Image
     img: Option<ImageDetails>,
     img_reader: Option<FileReader>,
-    loading: bool,
     sort_settings: SortSettings,
     zoomed: bool,
+    sorted_data: Option<Vec<u8>>,
+    show_original: bool,
     // Worker
     worker: Box<dyn Bridge<Worker>>,
     worker_status: Option<WorkerStatus>,
 }
 
+// todo:
+// - Make it easier to replace image (esp on mobile) without resetting settings. Make resetting settings not clear image, and re-run mask/sort.
 impl Component for App {
     type Message = Msg;
     type Properties = ();
@@ -67,9 +71,10 @@ impl Component for App {
         Self {
             img: None,
             img_reader: None,
-            loading: false,
             sort_settings: SortSettings::default(),
             zoomed: false,
+            sorted_data: None,
+            show_original: false,
             worker,
             worker_status: None,
         }
@@ -79,7 +84,6 @@ impl Component for App {
         match msg {
             Msg::LoadImage(file) => {
                 if let Some(file) = file {
-                    self.loading = true;
                     let file_name = file.name();
                     let file_type = file.raw_mime_type();
 
@@ -104,41 +108,46 @@ impl Component for App {
                     data,
                     file_type,
                     name: file_name,
-                    sorted_data: None,
                 });
                 self.img_reader = None;
-                self.loading = false;
+                ctx.link().send_message(Msg::RunWorker);
             }
             Msg::SetLowerThreshold(value) => {
                 self.sort_settings.lower_threshold = value;
                 if self.sort_settings.upper_threshold <= self.sort_settings.lower_threshold {
                     self.sort_settings.upper_threshold = self.sort_settings.lower_threshold;
                 }
+                ctx.link().send_message(Msg::SettingsChanged)
             }
             Msg::SetUpperThreshold(value) => {
                 self.sort_settings.upper_threshold = value;
                 if self.sort_settings.lower_threshold >= self.sort_settings.upper_threshold {
                     self.sort_settings.lower_threshold = self.sort_settings.upper_threshold;
                 }
+                ctx.link().send_message(Msg::SettingsChanged)
             }
             Msg::SetDirection(direction) => {
                 self.sort_settings.direction = direction;
+                ctx.link().send_message(Msg::SettingsChanged)
             }
             Msg::SetOrder(order) => {
                 self.sort_settings.order = order;
+                ctx.link().send_message(Msg::SettingsChanged)
             }
             Msg::Reset => {
-                self.img = None;
-                self.img_reader = None;
                 self.sort_settings = SortSettings::default();
+                ctx.link().send_message(Msg::RunWorker);
             }
             Msg::ToggleZoom => {
                 self.zoomed = !self.zoomed;
             }
+            Msg::SettingsChanged => ctx.link().send_message(Msg::RunWorker),
+            Msg::ToggleShowOriginal => {
+                self.show_original = !self.show_original;
+            }
             // Worker
             Msg::RunWorker => {
                 if let Some(img_details) = &self.img {
-                    self.loading = true;
                     self.worker.send(WorkerInput {
                         img_data: img_details.data.clone(),
                         settings: self.sort_settings.clone(),
@@ -147,16 +156,13 @@ impl Component for App {
             }
             Msg::WorkerMsg(output) => {
                 // the worker is done!
-                if let Some(img) = &mut self.img {
-                    match output {
-                        WorkerOutput::StatusUpdate(status) => {
-                            self.worker_status = Some(status);
-                        }
-                        WorkerOutput::Result(img_data) => {
-                            img.sorted_data = Some(img_data);
-                            self.loading = false;
-                            self.worker_status = None;
-                        }
+                match output {
+                    WorkerOutput::StatusUpdate(status) => {
+                        self.worker_status = Some(status);
+                    }
+                    WorkerOutput::Sorted(img_data) => {
+                        self.sorted_data = Some(img_data);
+                        self.worker_status = None;
                     }
                 }
             }
@@ -182,7 +188,7 @@ impl Component for App {
                                         min="0"
                                         max="255"
                                         value={self.sort_settings.lower_threshold.to_string()}
-                                        oninput={ctx.link().callback(|e: InputEvent| {
+                                        onchange={ctx.link().callback(|e: Event| {
                                             Msg::SetLowerThreshold(e.target_unchecked_into::<HtmlInputElement>().value().parse::<u8>().unwrap())
                                         })}
                                     />
@@ -194,7 +200,7 @@ impl Component for App {
                                         min="0"
                                         max="255"
                                         value={self.sort_settings.upper_threshold.to_string()}
-                                        oninput={ctx.link().callback(|e: InputEvent| {
+                                        onchange={ctx.link().callback(|e: Event| {
                                             Msg::SetUpperThreshold(e.target_unchecked_into::<HtmlInputElement>().value().parse::<u8>().unwrap())
                                         })}
                                     />
@@ -244,19 +250,22 @@ impl Component for App {
                                 </div>
                             </fieldset>
                             <div class={classes!("button-row")}>
+                                <label class="custom-checkbox">
+                                    <div class="box">
+                                        <input
+                                            type="checkbox"
+                                            checked={self.show_original}
+                                            onchange={ctx.link().callback(|_: Event| Msg::ToggleShowOriginal)}
+                                        />
+                                        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>
+                                    </div>
+                                    <span>{ "Show original" }</span>
+                                </label>
                                 <Button
                                     style={ButtonStyle::Borderless}
-                                    disabled={self.img.is_none()}
                                     onclick={ctx.link().callback(|_| Msg::Reset)}
                                 >
                                     { "Reset" }
-                                </Button>
-                                <Button
-                                    style={ButtonStyle::Primary}
-                                    disabled={self.worker_status.is_some() || self.img.is_none()}
-                                    onclick={ctx.link().callback(|_| Msg::RunWorker)}
-                                >
-                                    { "Sort" }
                                 </Button>
                             </div>
                         </div>
@@ -277,9 +286,6 @@ impl Component for App {
                     >
                         if let Some(img_details) = &self.img {
                             { self.view_img(ctx, img_details) }
-                            if self.zoomed {
-                                <FullscreenImage img_details={img_details.clone()} onclose={ctx.link().callback(|_| Msg::ToggleZoom)} />
-                            }
                         } else {
                             <label
                                 for="file-upload"
@@ -313,16 +319,18 @@ impl Component for App {
 
 impl App {
     fn view_img(&self, ctx: &Context<Self>, img: &ImageDetails) -> Html {
-        let (data, file_type) = if let Some(sorted) = &img.sorted_data {
-            // Sorted image is always jpeg (png encoding is really slow)
-            (sorted, "image/jpeg".to_string())
-        } else {
-            (&img.data, img.file_type.clone())
-        };
+        let (data, file_type) =
+            if let (Some(sorted), false) = (&self.sorted_data, self.show_original) {
+                // Sorted image is always jpeg (png encoding is really slow)
+                (sorted, "image/jpeg".to_string())
+            } else {
+                (&img.data, img.file_type.clone())
+            };
+
         html! {
             <>
                 <img
-                    onclick={ctx.link().callback(|_| Msg::ToggleZoom)}
+                    onclick={ctx.link().callback(move |_| Msg::ToggleZoom)}
                     src={format!("data:{};base64,{}", file_type, b64.encode(data.as_slice()))}
                     alt={img.name.clone()}
                 />
@@ -332,13 +340,22 @@ impl App {
                             <Icon icon_id={IconId::LucideLoader} />
                             if let Some(status) = &self.worker_status {
                                 {match status {
-                                    WorkerStatus::Decoding => {"Decoding image..."},
-                                    WorkerStatus::Sorting => {"Sorting the pixels..."},
-                                    WorkerStatus::Encoding => {"Encoding the image..."},
+                                    WorkerStatus::Decoding => {"Decoding image"},
+                                    WorkerStatus::Sorting => {"Sorting the pixels"},
+                                    WorkerStatus::Masking => {"Generating mask"},
+                                    WorkerStatus::Encoding => {"Encoding the image"},
                                 }}
                             }
                         </div>
                     </div>
+                }
+                if self.zoomed {
+                    <FullscreenImage
+                        data={data.clone()}
+                        name={img.name.clone()}
+                        file_type={file_type}
+                        onclose={ctx.link().callback(|_| Msg::ToggleZoom)}
+                    />
                 }
             </>
         }

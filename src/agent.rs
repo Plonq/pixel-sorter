@@ -1,11 +1,8 @@
-use std::io::{BufWriter, Cursor, Write};
-
 use image::ImageFormat;
 use serde::{Deserialize, Serialize};
 use yew_agent::{HandlerId, Public, WorkerLink};
 
-use crate::img;
-use crate::img::get_orientation;
+use crate::img::{get_orientation, ImageToBytes, sort_img, SortSettings};
 
 pub struct Worker {
     link: WorkerLink<Self>,
@@ -14,20 +11,21 @@ pub struct Worker {
 #[derive(Serialize, Deserialize)]
 pub struct WorkerInput {
     pub img_data: Vec<u8>,
-    pub settings: img::SortSettings,
+    pub settings: SortSettings,
 }
 
 #[derive(Serialize, Deserialize)]
 pub enum WorkerStatus {
     Decoding,
     Sorting,
+    Masking,
     Encoding,
 }
 
 #[derive(Serialize, Deserialize)]
 pub enum WorkerOutput {
     StatusUpdate(WorkerStatus),
-    Result(Vec<u8>),
+    Sorted(Vec<u8>),
 }
 
 impl yew_agent::Worker for Worker {
@@ -59,14 +57,11 @@ impl yew_agent::Worker for Worker {
 
         self.link
             .respond(id, WorkerOutput::StatusUpdate(WorkerStatus::Sorting));
-        let img = img::sort_img(img, msg.settings);
-        let mut buf: BufWriter<Cursor<Vec<u8>>> = BufWriter::new(Cursor::new(vec![]));
+        let img = sort_img(img, msg.settings);
         self.link
             .respond(id, WorkerOutput::StatusUpdate(WorkerStatus::Encoding));
-        img.write_to(&mut buf, ImageFormat::Jpeg).unwrap();
-        buf.flush().unwrap();
-        let sorted = buf.get_ref().to_owned().into_inner();
-        self.link.respond(id, WorkerOutput::Result(sorted))
+        let sorted = img.to_bytes(ImageFormat::Jpeg);
+        self.link.respond(id, WorkerOutput::Sorted(sorted))
     }
 
     fn name_of_resource() -> &'static str {

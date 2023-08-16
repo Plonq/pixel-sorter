@@ -1,6 +1,6 @@
-use std::io::{BufReader, Cursor};
+use std::io::{BufReader, BufWriter, Cursor, Write};
 
-use image::{DynamicImage, GenericImageView, ImageBuffer, Pixel, Rgba};
+use image::{DynamicImage, GenericImageView, ImageBuffer, ImageFormat, Pixel, Rgba};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Default)]
@@ -106,6 +106,19 @@ pub fn sort_img(img: DynamicImage, settings: SortSettings) -> ImageBuffer<Rgba<u
     }
 
     output
+}
+
+pub trait ImageToBytes {
+    fn to_bytes(&self, format: ImageFormat) -> Vec<u8>;
+}
+
+impl ImageToBytes for ImageBuffer<Rgba<u8>, Vec<u8>> {
+    fn to_bytes(&self, format: ImageFormat) -> Vec<u8> {
+        let mut buf: BufWriter<Cursor<Vec<u8>>> = BufWriter::new(Cursor::new(vec![]));
+        self.write_to(&mut buf, format).unwrap();
+        buf.flush().unwrap();
+        buf.get_ref().to_owned().into_inner()
+    }
 }
 
 pub fn get_orientation(img_data: &Vec<u8>) -> Option<u32> {
