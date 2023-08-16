@@ -28,8 +28,8 @@ pub struct SortSettings {
 impl Default for SortSettings {
     fn default() -> Self {
         SortSettings {
-            lower_threshold: 50,
-            upper_threshold: 150,
+            lower_threshold: 75,
+            upper_threshold: 175,
             direction: Direction::Horizontal,
             order: Order::Ascending,
         }

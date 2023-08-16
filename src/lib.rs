@@ -11,7 +11,7 @@ use yew_agent::{Bridge, Bridged};
 use yew_icons::{Icon, IconId};
 
 use crate::agent::{Worker, WorkerInput, WorkerOutput, WorkerStatus};
-use crate::components::{Button, ButtonStyle, FullscreenImage, Header};
+use crate::components::{Button, FullscreenImage, Header};
 use crate::img::{Direction, Order, SortSettings};
 
 pub mod agent;
@@ -119,14 +119,12 @@ impl Component for App {
                 if self.sort_settings.upper_threshold <= self.sort_settings.lower_threshold {
                     self.sort_settings.upper_threshold = self.sort_settings.lower_threshold;
                 }
-                ctx.link().send_message(Msg::SettingsChanged)
             }
             Msg::SetUpperThreshold(value) => {
                 self.sort_settings.upper_threshold = value;
                 if self.sort_settings.lower_threshold >= self.sort_settings.upper_threshold {
                     self.sort_settings.lower_threshold = self.sort_settings.upper_threshold;
                 }
-                ctx.link().send_message(Msg::SettingsChanged)
             }
             Msg::SetDirection(direction) => {
                 self.sort_settings.direction = direction;
@@ -193,9 +191,10 @@ impl Component for App {
                                         min="0"
                                         max="255"
                                         value={self.sort_settings.lower_threshold.to_string()}
-                                        onchange={ctx.link().callback(|e: Event| {
+                                        oninput={ctx.link().callback(|e: InputEvent| {
                                             Msg::SetLowerThreshold(e.target_unchecked_into::<HtmlInputElement>().value().parse::<u8>().unwrap())
                                         })}
+                                        onchange={ctx.link().callback(|_: Event| Msg::SettingsChanged)}
                                     />
                                     <span>{ self.sort_settings.lower_threshold }</span>
                                     <label for="upper-threshold">{ "Upper threshold: "}</label>
@@ -205,9 +204,10 @@ impl Component for App {
                                         min="0"
                                         max="255"
                                         value={self.sort_settings.upper_threshold.to_string()}
-                                        onchange={ctx.link().callback(|e: Event| {
+                                        oninput={ctx.link().callback(|e: InputEvent| {
                                             Msg::SetUpperThreshold(e.target_unchecked_into::<HtmlInputElement>().value().parse::<u8>().unwrap())
                                         })}
+                                        onchange={ctx.link().callback(|_: Event| Msg::SettingsChanged)}
                                     />
                                     <span>{ self.sort_settings.upper_threshold }</span>
                                 </div>
