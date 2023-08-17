@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use std::rc::Rc;
 
 use base64::engine::{general_purpose::STANDARD as b64, Engine};
@@ -338,13 +339,34 @@ impl App {
                 (&img.data, img.file_type.clone())
             };
 
+        let data_str = format!("data:{};base64,{}", file_type, b64.encode(data.as_slice()));
+        let download_filename = format!(
+            "{}_sorted.jpg",
+            PathBuf::from(img.name.clone())
+                .file_stem()
+                .unwrap()
+                .to_str()
+                .unwrap()
+        );
+
         html! {
             <>
                 <img
                     onclick={ctx.link().callback(move |_| Msg::ToggleZoom)}
-                    src={format!("data:{};base64,{}", file_type, b64.encode(data.as_slice()))}
+                    src={data_str.clone()}
                     alt={img.name.clone()}
                 />
+                if self.worker_status.is_none() {
+                    <a
+                        class="download-btn"
+                        download={download_filename}
+                        href={data_str}
+                        title="Download image"
+                        aria-label="Download image"
+                    >
+                        <Icon icon_id={IconId::LucideDownload} />
+                    </a>
+                }
                 if self.worker_status.is_some() {
                     <div class={classes!("overlay")}>
                         <div class={classes!("content")}>

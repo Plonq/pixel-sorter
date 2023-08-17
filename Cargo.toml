@@ -9,7 +9,7 @@ edition = "2021"
 # Framework and UI
 yew = { version = "0.20", features = ["csr"] }
 yew-agent = "0.2"
-yew_icons = { version = "0.7", features = ["LucideLoader", "LucideImagePlus"] }
+yew_icons = { version = "0.7", features = ["LucideLoader", "LucideImagePlus", "LucideDownload"] }
 serde = "1"
 # WASM
 js-sys = "0.3.46"
