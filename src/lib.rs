@@ -353,7 +353,6 @@ impl App {
                                 {match status {
                                     WorkerStatus::Decoding => {"Decoding image"},
                                     WorkerStatus::Sorting => {"Sorting the pixels"},
-                                    WorkerStatus::Masking => {"Generating mask"},
                                     WorkerStatus::Encoding => {"Encoding the image"},
                                 }}
                             }

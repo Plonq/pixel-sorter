@@ -2,7 +2,7 @@ use image::ImageFormat;
 use serde::{Deserialize, Serialize};
 use yew_agent::{HandlerId, Public, WorkerLink};
 
-use crate::img::{get_orientation, ImageToBytes, sort_img, SortSettings};
+use crate::img::{get_orientation, sort_img, ImageToBytes, SortSettings};
 
 pub struct Worker {
     link: WorkerLink<Self>,
@@ -18,7 +18,6 @@ pub struct WorkerInput {
 pub enum WorkerStatus {
     Decoding,
     Sorting,
-    Masking,
     Encoding,
 }
 
