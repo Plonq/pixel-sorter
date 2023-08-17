@@ -195,6 +195,10 @@ main {
       justify-content: flex-end;
       align-items: center;
       flex-wrap: wrap;
+
+      + .button-row {
+        margin-top: 12px;
+      }
     }
   }
 }
@@ -255,31 +259,13 @@ main {
   .placeholder {
     margin: 0 16px;
   }
-
-  .download-btn {
-    cursor: pointer;
-    background: var(--color-body-bg);
-    color: var(--color-body-fg);
-    border: 1px solid var(--color-border);
-    border-radius: 3px;
-    padding: 6px 8px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: 0;
-    right: 0;
-    opacity: 0;
-    transition: opacity 0.1s ease;
-  }
-
-  &:hover .download-btn {
-    opacity: 1;
-  }
 }
 
 // Utils
+
+.mr-auto {
+  margin-right: auto;
+}
 
 .overlay-container {
   position: relative;
@@ -312,7 +298,10 @@ main {
 
 .fullscreen-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
   padding: 20px;
   display: flex;
   align-items: center;
@@ -383,10 +372,14 @@ main {
   border: 0;
   border-radius: 3px;
   box-shadow: 0 1px 2px 0 hsla(0, 0%, 0%, 0.19);
-  padding: 9px 15px;
+  padding: 0 9px;
   cursor: pointer;
   font-size: 1rem;
   font-weight: bold;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
 
   &:disabled {
     cursor: initial;
@@ -403,35 +396,8 @@ main {
     }
   }
 
-  &.primary {
-    background: var(--btn-primary);
-    color: var(--btn-primary-text);
-
-    &:not(:disabled) {
-      &:hover {
-        background: var(--btn-primary-hover);
-      }
-
-      &:active {
-        background: var(--btn-primary-active);
-      }
-    }
-  }
-
-  &.borderless {
-    background: transparent;
-    color: var(--color-body-fg);
-    box-shadow: none;
-
-    &:not(:disabled) {
-      &:hover {
-        background: rgba(0, 0, 0, 0.05);
-      }
-
-      &:active {
-        background:  rgba(0, 0, 0, 0.05);
-      }
-    }
+  svg {
+    margin-right: 6px;
   }
 }
 
@@ -570,7 +536,10 @@ fieldset {
 
     .checkmark {
       position: absolute;
-      inset: 2px;
+      top: 2px;
+      right: 2px;
+      bottom: 2px;
+      left: 2px;
       opacity: 0;
       color: var(--color-radio);
     }

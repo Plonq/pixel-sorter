@@ -12,7 +12,7 @@ use yew_agent::{Bridge, Bridged};
 use yew_icons::{Icon, IconId};
 
 use crate::agent::{Worker, WorkerInput, WorkerOutput, WorkerStatus};
-use crate::components::{Button, FullscreenImage, Header};
+use crate::components::{FullscreenImage, Header};
 use crate::img::{Direction, Order, SortSettings};
 
 pub mod agent;
@@ -253,8 +253,18 @@ impl Component for App {
                                     </label>
                                 </div>
                             </fieldset>
-                            <div class={classes!("button-row")}>
-                                if self.img.is_some() {
+                            <div class="button-row">
+                                <button
+                                    class="btn mr-auto"
+                                    disabled={self.worker_status.is_some()}
+                                    onclick={ctx.link().callback(|_| Msg::Reset)}
+                                >
+                                    <Icon icon_id={IconId::LucideHistory} />
+                                    { "Reset" }
+                                </button>
+                            </div>
+                            if let Some(img) = &self.img {
+                                <div class="button-row">
                                     <label class="custom-checkbox">
                                         <div class="box">
                                             <input
@@ -266,20 +276,18 @@ impl Component for App {
                                         </div>
                                         <span>{ "Show original" }</span>
                                     </label>
-                                    <Button
+                                    <button
+                                        class="btn"
                                         disabled={self.worker_status.is_some()}
                                         onclick={ctx.link().callback(|_| Msg::ClearImage)}
                                     >
                                         { "Clear Image" }
-                                    </Button>
-                                }
-                                <Button
-                                    disabled={self.worker_status.is_some()}
-                                    onclick={ctx.link().callback(|_| Msg::Reset)}
-                                >
-                                    { "Reset" }
-                                </Button>
-                            </div>
+                                    </button>
+                                    if let (Some(sorted_data), true) = (&self.sorted_data, self.worker_status.is_none()) {
+                                        { self.download_button(sorted_data, img.name.clone()) }
+                                    }
+                                </div>
+                            }
                         </div>
                     </div>
                     <div
@@ -340,14 +348,6 @@ impl App {
             };
 
         let data_str = format!("data:{};base64,{}", file_type, b64.encode(data.as_slice()));
-        let download_filename = format!(
-            "{}_sorted.jpg",
-            PathBuf::from(img.name.clone())
-                .file_stem()
-                .unwrap()
-                .to_str()
-                .unwrap()
-        );
 
         html! {
             <>
@@ -356,17 +356,6 @@ impl App {
                     src={data_str.clone()}
                     alt={img.name.clone()}
                 />
-                if self.worker_status.is_none() {
-                    <a
-                        class="download-btn"
-                        download={download_filename}
-                        href={data_str}
-                        title="Download image"
-                        aria-label="Download image"
-                    >
-                        <Icon icon_id={IconId::LucideDownload} />
-                    </a>
-                }
                 if self.worker_status.is_some() {
                     <div class={classes!("overlay")}>
                         <div class={classes!("content")}>
@@ -390,6 +379,29 @@ impl App {
                     />
                 }
             </>
+        }
+    }
+
+    fn download_button(&self, data: &Vec<u8>, original_name: String) -> Html {
+        let data_str = format!("data:image/jpeg;base64,{}", b64.encode(data.as_slice()));
+        let download_filename = format!(
+            "{}_sorted.jpg",
+            PathBuf::from(original_name)
+                .file_stem()
+                .unwrap()
+                .to_str()
+                .unwrap()
+        );
+
+        html! {
+            <a
+                class="btn"
+                download={download_filename}
+                href={data_str}
+            >
+                <Icon icon_id={IconId::LucideDownload} />
+                { "Save" }
+            </a>
         }
     }
 
