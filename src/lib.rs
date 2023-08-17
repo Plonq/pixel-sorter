@@ -56,8 +56,6 @@ pub struct App {
     worker_status: Option<WorkerStatus>,
 }
 
-// todo:
-// - Make it easier to replace image (esp on mobile) without resetting settings. Make resetting settings not clear image, and re-run mask/sort.
 impl Component for App {
     type Message = Msg;
     type Properties = ();
