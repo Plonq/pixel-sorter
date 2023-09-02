@@ -48,7 +48,9 @@ pub fn sort_img(img: DynamicImage, settings: SortSettings) -> ImageBuffer<Rgba<u
                     let pixel = img.get_pixel(x, y);
                     let luminance = pixel.to_luma().0[0];
                     output.put_pixel(x, y, pixel);
-                    if luminance < settings.lower_threshold || luminance > settings.upper_threshold
+                    if luminance < settings.lower_threshold
+                        || luminance > settings.upper_threshold
+                        || x == w - 1
                     {
                         if (span_start as isize) < (x as isize) - 1 {
                             // Sort the span
@@ -79,7 +81,9 @@ pub fn sort_img(img: DynamicImage, settings: SortSettings) -> ImageBuffer<Rgba<u
                     let pixel = img.get_pixel(x, y);
                     let luminance = pixel.to_luma().0[0];
                     output.put_pixel(x, y, pixel);
-                    if luminance < settings.lower_threshold || luminance > settings.upper_threshold
+                    if luminance < settings.lower_threshold
+                        || luminance > settings.upper_threshold
+                        || y == h - 1
                     {
                         if (span_start as isize) < (y as isize) - 1 {
                             // Sort the span
